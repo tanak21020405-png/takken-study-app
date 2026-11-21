@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>宅建学習管理</title>
+<style>
+body{font-family:sans-serif;background:#f3f6fa;margin:0;padding:20px;color:#243247}
+main{max-width:650px;margin:auto}
+section{background:white;padding:18px;border-radius:12px;margin:14px 0}
+input,select,textarea,button{box-sizing:border-box;width:100%;padding:12px;margin:6px 0;font-size:16px}
+button{background:#1769d2;color:white;border:0;border-radius:8px}
+li{margin:12px 0;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<h1>宅建学習管理アプリ</h1>
+<section>
+<h2>今日の学習を記録</h2>
+<input id="topic" placeholder="学習項目（例：宅建業法）">
+<input id="minutes" type="number" min="1" placeholder="学習時間（分）">
+<select id="level">
+<option>未学習</option>
+<option>復習必要</option>
+<option>定着</option>
+</select>
+<textarea id="memo" placeholder="間違えた問題・注意点"></textarea>
+<button onclick="save()">記録する</button>
+</section>
+<section>
+<h2>学習の記録</h2>
+<p id="total"></p>
+<ul id="records"></ul>
+</section>
+</main>
+<script>
+const key="takken-records-v1";
+function getData(){try{return JSON.parse(localStorage.getItem(key))||[]}catch{return []}}
+function save(){
+const topic=document.getElementById("topic").value.trim();
+const minutes=Number(document.getElementById("minutes").value);
+if(!topic||!Number.isFinite(minutes)||minutes<=0){alert("学習項目と正しい学習時間を入力してください");return}
+const data=getData();
+data.unshift({date:new Date().toLocaleDateString("ja-JP"),topic,minutes,level:document.getElementById("level").value,memo:document.getElementById("memo").value});
+try{localStorage.setItem(key,JSON.stringify(data));render();document.getElementById("topic").value="";document.getElementById("minutes").value="";document.getElementById("memo").value=""}catch{alert("保存できませんでした")}
+}
+function render(){
+const data=getData();
+document.getElementById("total").textContent="累計学習時間："+data.reduce((s,r)=>s+r.minutes,0)+"分";
+const ul=document.getElementById("records");ul.replaceChildren();
+data.forEach(r=>{const li=document.createElement("li");li.textContent=r.date+"｜"+r.topic+"｜"+r.minutes+"分｜"+r.level+(r.memo?"｜"+r.memo:"");ul.appendChild(li)})
+}
+render();
+</script>
+</body>
+</html>
