@@ -1,0 +1,2811 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="artifact-type" content="tool">
+<meta name="design-style" content="vitals">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="宅建進捗管理">
+<meta name="theme-color" content="#0f7c8a">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='36' fill='%230f7c8a'/%3E%3Ctext x='90' y='108' text-anchor='middle' font-size='64' font-weight='800' fill='%23ffffff' font-family='sans-serif'%3E%E5%AE%85%E5%BB%BA%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22%E5%AE%85%E5%BB%BA%E8%A9%A6%E9%A8%93%20%E5%AD%A6%E7%BF%92%E9%80%B2%E6%8D%97%E7%AE%A1%E7%90%86%22%2C%22short_name%22%3A%22%E5%AE%85%E5%BB%BA%E9%80%B2%E6%8D%97%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f1f7f8%22%2C%22theme_color%22%3A%22%230f7c8a%22%7D">
+<title>宅建試験 学習進捗管理ナビ（権利関係・法令上の制限・宅建業法）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Figtree:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+
+  /* Vitals core surfaces */
+  --background: #ffffff;
+  --surface-container-low: #f4f7fd;
+  --surface-container: #eaf1fc;
+  --surface-container-high: #dbe7f9;
+
+  /* Vitals text */
+  --on-surface: #1b2b33;
+  --on-surface-variant: #46585f;
+
+  /* Vitals rules */
+  --outline: #7b9198;
+  --outline-variant: #d5e3e5;
+
+  /* Vitals accents */
+  --primary: #235cbb;
+  --on-primary: #ffffff;
+  --primary-hover: #174994;
+  --primary-container: #e7efff;
+  --on-primary-container: #163f84;
+  --secondary: #1d5e3a;
+  --tertiary: #2e7d4f;
+  --error: #b3261e;
+  --on-error: #ffffff;
+
+  /* Shared semantic tokens */
+  --positive: #2e7d4f;
+  --positive-bg: #e7f4ec;
+  --warning: #b86e00;
+  --warning-bg: #fdf3e1;
+  --error-bg: #fbeaea;
+  --neutral-bg: #edf2f3;
+  --focus: #0f7c8a;
+
+  /* Rank badge tokens */
+  --rank-aa-bg: #fbeaea;
+  --rank-aa-text: #8c1d18;
+  --rank-a-bg: #e3f1f3;
+  --rank-a-text: #0a5560;
+  --rank-b-bg: #e7f4ec;
+  --rank-b-text: #1d5e3a;
+  --rank-c-bg: #edf2f3;
+  --rank-c-text: #46585f;
+
+  /* Data series */
+  --data-1: #0f7c8a;
+  --data-2: #2e7d4f;
+  --data-3: #b86e00;
+  --data-4: #5c5fb0;
+  --data-context: #b8c7ca;
+
+  /* Typography */
+  --font-headline: 'Noto Sans JP', 'Figtree', sans-serif;
+  --font-body: 'Noto Sans JP', 'Atkinson Hyperlegible', sans-serif;
+  --font-label: 'Noto Sans JP', 'Figtree', sans-serif;
+
+  /* Type scale (Focused Tool) */
+  --display-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.125rem);
+  --headline-size: clamp(1.1875rem, 1.05rem + 0.4vw, 1.375rem);
+  --subhead-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+  --label-size: 0.75rem;
+
+  /* Shape & effects */
+  --rounded: 0.625rem;
+  --rounded-lg: 0.875rem;
+  --rounded-full: 9999px;
+  --top-bar: 6px solid var(--primary);
+  --status-bar-width: 4px;
+  --card-border: 1px solid var(--outline-variant);
+  --card-lift: 0 1px 2px rgb(27 43 51 / 0.05), 0 6px 16px rgb(27 43 51 / 0.05);
+
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.25rem;
+  --space-2xl: 3.5rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+}
+
+/* Base reset */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  overflow-x: clip;
+  margin: 0;
+  padding: 0;
+  background-color: var(--surface-container-low);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+header { position: static !important; }
+button, input, select, textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.page-shell {
+  border-top: var(--top-bar);
+  min-height: 100dvh;
+  padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
+}
+
+.page-grid {
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  padding-top: calc(var(--space-lg) + env(safe-area-inset-top));
+  max-width: 1140px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.page-grid * { min-width: 0; }
+
+/* Header & Pomodoro Mini Bar */
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+.title-block {
+  flex: 1 1 320px;
+}
+.kicker {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--space-xs) 0;
+}
+.title {
+  font-family: var(--font-headline);
+  font-size: var(--display-size);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  color: var(--on-surface);
+  margin: 0;
+}
+.lede {
+  font-size: 0.9375rem;
+  color: var(--on-surface-variant);
+  margin: var(--space-xs) 0 0 0;
+  max-width: 60ch;
+}
+
+/* Study Timer Widget */
+.timer-card {
+  background: var(--background);
+  border: var(--card-border);
+  border-left: var(--status-bar-width) solid var(--primary);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
+  flex: 0 1 auto;
+}
+.timer-readout {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 1.375rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface);
+  min-width: 72px;
+}
+.timer-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Navigation Tabs (Desktop) */
+.desktop-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  border-bottom: var(--card-border);
+  padding-bottom: var(--space-xs);
+}
+.nav-tab {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: var(--space-sm) var(--space-md);
+  min-height: 44px;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  border-radius: var(--rounded) var(--rounded) 0 0;
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+.nav-tab:hover {
+  background-color: var(--surface-container);
+  color: var(--on-surface);
+}
+.nav-tab.is-active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background-color: var(--background);
+}
+.nav-count {
+  font-size: var(--label-size);
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--rounded-full);
+  background: var(--surface-container);
+  color: var(--on-primary-container);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mobile Bottom Dock */
+.mobile-dock {
+  display: none;
+}
+
+/* Buttons */
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--rounded);
+  padding: 0.5rem 0.9rem;
+  min-height: 44px;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8125rem;
+}
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+.btn-secondary {
+  background-color: var(--background);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.btn-secondary:hover {
+  background-color: var(--surface-container);
+}
+.btn-ghost {
+  background-color: var(--surface-container-low);
+  border-color: var(--outline-variant);
+  color: var(--on-surface);
+}
+.btn-ghost:hover {
+  background-color: var(--surface-container);
+}
+.btn-danger {
+  background-color: var(--error);
+  color: var(--on-error);
+}
+.btn-danger-outline {
+  background-color: var(--background);
+  border-color: var(--error);
+  color: var(--error);
+}
+.btn-danger-outline:hover {
+  background-color: var(--error-bg);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Summary KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+  gap: var(--space-md);
+}
+.status-card {
+  background: var(--background);
+  border: var(--card-border);
+  border-left: var(--status-bar-width) solid var(--primary);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md);
+  transition: box-shadow var(--dur-short) var(--ease-out);
+}
+.status-card[data-status="ok"] { border-left-color: var(--tertiary); }
+.status-card[data-status="warn"] { border-left-color: var(--warning); }
+.status-card[data-status="alert"] { border-left-color: var(--error); }
+.status-card[data-status="idle"] { border-left-color: var(--outline); }
+
+.kpi-label {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+.kpi-value {
+  font-family: var(--font-headline);
+  font-size: clamp(1.375rem, 1.15rem + 0.8vw, 1.75rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface);
+  margin: var(--space-xs) 0 0 0;
+  line-height: 1.2;
+}
+.kpi-sub {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  margin: var(--space-xs) 0 0 0;
+}
+.kpi-sub[data-status="ok"] { color: var(--secondary); font-weight: 600; }
+.kpi-sub[data-status="alert"] { color: var(--error); font-weight: 600; }
+
+/* Progress Bar with Reference Range Band */
+.meter-track {
+  position: relative;
+  height: 10px;
+  border-radius: var(--rounded-full);
+  background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  overflow: hidden;
+  margin-top: var(--space-sm);
+}
+.meter-target-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 80%;
+  width: 20%;
+  background: var(--positive-bg);
+  border-left: 1px dashed var(--tertiary);
+}
+.meter-fill {
+  position: relative;
+  height: 100%;
+  border-radius: var(--rounded-full);
+  background: var(--primary);
+  transition: width var(--dur-short) var(--ease-out);
+}
+.meter-fill[data-status="ok"] { background: var(--tertiary); }
+.meter-fill[data-status="warn"] { background: var(--warning); }
+.meter-fill[data-status="alert"] { background: var(--error); }
+
+/* Subject Overview Banner */
+.subject-banner {
+  background: var(--background);
+  border: var(--card-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md) var(--space-lg);
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: center;
+}
+.subject-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.section-heading {
+  font-family: var(--font-headline);
+  font-size: var(--headline-size);
+  font-weight: 800;
+  margin: 0;
+  color: var(--on-surface);
+}
+.time-alloc-box {
+  background: var(--surface-container-low);
+  border: var(--card-border);
+  border-radius: var(--rounded);
+  padding: var(--space-sm) var(--space-md);
+}
+.time-alloc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+}
+.time-alloc-nums {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+/* Filter Toolbar */
+.filter-bar {
+  background: var(--background);
+  border: var(--card-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.filter-label {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  margin-right: var(--space-xs);
+}
+.chip-btn {
+  appearance: none;
+  border: 1px solid var(--outline-variant);
+  background: var(--background);
+  color: var(--on-surface-variant);
+  border-radius: var(--rounded-full);
+  padding: 0.35rem 0.75rem;
+  min-height: 36px;
+  font-family: var(--font-label);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+.chip-btn:hover {
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+}
+.chip-btn.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+.search-input-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.field-label {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.text-input, .date-input, .num-input, .memo-textarea, .select-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--outline);
+  border-radius: var(--rounded);
+  background: var(--background);
+  color: var(--on-surface);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.text-input:focus, .date-input:focus, .num-input:focus, .memo-textarea:focus, .select-input:focus {
+  border-color: var(--primary);
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.memo-textarea {
+  min-height: 108px;
+  resize: vertical;
+}
+
+/* Badges & Reassurance Chips */
+.chip {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: var(--label-size);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--rounded-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.chip-rank-AA { background: var(--rank-aa-bg); color: var(--rank-aa-text); }
+.chip-rank-A { background: var(--rank-a-bg); color: var(--rank-a-text); }
+.chip-rank-B { background: var(--rank-b-bg); color: var(--rank-b-text); }
+.chip-rank-C { background: var(--rank-c-bg); color: var(--rank-c-text); }
+.chip-page { background: var(--surface-container-low); color: var(--on-surface-variant); border: 1px solid var(--outline-variant); }
+.chip-kw { background: var(--on-surface); color: var(--background); }
+.chip-target { background: var(--primary-container); color: var(--on-primary-container); }
+.chip-ok { background: var(--positive-bg); color: var(--secondary); }
+.chip-warn { background: var(--warning-bg); color: var(--warning); }
+.chip-alert { background: var(--error-bg); color: var(--error); }
+
+/* Lecture Card */
+.lecture-list {
+  display: grid;
+  gap: var(--space-md);
+}
+.lecture-card {
+  background: var(--background);
+  border: var(--card-border);
+  border-left: var(--status-bar-width) solid var(--outline);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
+}
+.lecture-card[data-status="ok"] { border-left-color: var(--tertiary); }
+.lecture-card[data-status="progress"] { border-left-color: var(--primary); }
+.lecture-card[data-status="warn"] { border-left-color: var(--warning); }
+.lecture-card[data-status="alert"] { border-left-color: var(--error); }
+
+.lecture-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+.lecture-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+.lecture-num {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 0.875rem;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+.lecture-title {
+  font-family: var(--font-headline);
+  font-size: var(--subhead-size);
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0.25rem 0 0 0;
+}
+.lecture-summary-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto;
+  gap: var(--space-md);
+  align-items: center;
+  padding-top: var(--space-xs);
+}
+.mastery-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.mastery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.8125rem;
+}
+.mastery-pct {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.log-summary {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* Expanded Lecture Workspace */
+.lecture-detail {
+  border-top: var(--card-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-xs);
+  display: grid;
+  gap: var(--space-lg);
+}
+.detail-section {
+  background: var(--surface-container-low);
+  border: var(--card-border);
+  border-radius: var(--rounded);
+  padding: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
+}
+.detail-heading {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  margin: 0;
+  color: var(--on-surface);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Form rows inside detail */
+.log-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+.quick-min-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+}
+.mastery-control-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: var(--space-md);
+  align-items: center;
+}
+.range-slider {
+  width: 100%;
+  accent-color: var(--primary);
+  height: 32px;
+  cursor: pointer;
+}
+
+/* Log History Pills */
+.history-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+.history-item {
+  background: var(--background);
+  border: var(--card-border);
+  border-radius: var(--rounded);
+  padding: 0.45rem 0.7rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+}
+
+/* Recall Keywords Panel */
+.kw-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.kw-toggle-chip {
+  appearance: none;
+  border: 1px solid var(--outline);
+  background: var(--background);
+  color: var(--on-surface);
+  border-radius: var(--rounded);
+  padding: 0.35rem 0.65rem;
+  min-height: 36px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.kw-toggle-chip.is-checked {
+  background: var(--positive-bg);
+  border-color: var(--tertiary);
+  color: var(--secondary);
+}
+
+/* Voice Memo & AI Diagnosis */
+.voice-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+.rec-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--error);
+  font-variant-numeric: tabular-nums;
+}
+.rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--rounded-full);
+  background: var(--error);
+}
+.wave-canvas {
+  width: 100%;
+  height: 44px;
+  background: var(--background);
+  border: var(--card-border);
+  border-radius: var(--rounded);
+  display: block;
+}
+.diagnosis-card {
+  background: var(--background);
+  border: var(--card-border);
+  border-left: var(--status-bar-width) solid var(--primary);
+  border-radius: var(--rounded);
+  padding: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
+}
+.diagnosis-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.diag-grade {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--primary);
+}
+.diag-feedback {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--on-surface);
+}
+.inline-msg {
+  font-size: 0.8125rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--rounded);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+.inline-msg.is-error {
+  background: var(--error-bg);
+  color: var(--error);
+}
+.inline-msg.is-ok {
+  background: var(--positive-bg);
+  color: var(--secondary);
+}
+
+/* Dashboard Charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: var(--space-lg);
+}
+.chart-panel {
+  background: var(--background);
+  border: var(--card-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.chart-panel-wide {
+  grid-column: 1 / -1;
+}
+.chart-title {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+  color: var(--on-surface);
+}
+.chart-sub {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+.chart-box {
+  position: relative;
+  min-height: 250px;
+  width: 100%;
+}
+
+/* Backup / Sync Panel */
+.sync-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: var(--space-lg);
+}
+.sync-card {
+  background: var(--background);
+  border: var(--card-border);
+  border-left: var(--status-bar-width) solid var(--primary);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-lg);
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
+}
+.code-box {
+  width: 100%;
+  min-height: 140px;
+  padding: var(--space-sm);
+  border: 1px solid var(--outline);
+  border-radius: var(--rounded);
+  background: var(--surface-container-low);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+/* Empty State */
+.empty-box {
+  background: var(--background);
+  border: var(--card-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  display: grid;
+  gap: var(--space-sm);
+  justify-items: center;
+}
+
+.app-footer {
+  border-top: var(--card-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-lg);
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+/* Responsive Mobile (iPhone) Optimization */
+@media (max-width: 768px) {
+  .page-shell {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+  .page-grid {
+    padding: var(--space-md) 0.75rem;
+    gap: var(--space-md);
+  }
+  .desktop-nav {
+    display: none;
+  }
+  .mobile-dock {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background: var(--background);
+    border-top: var(--card-border);
+    padding: 0.3rem 0.25rem calc(0.3rem + env(safe-area-inset-bottom));
+    box-shadow: var(--card-lift);
+  }
+  .dock-btn {
+    appearance: none;
+    background: transparent;
+    border: none;
+    min-height: 48px;
+    padding: 0.25rem 0.15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    font-family: var(--font-label);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    border-radius: var(--rounded);
+  }
+  .dock-btn.is-active {
+    color: var(--primary);
+    background: var(--primary-container);
+  }
+  .subject-banner {
+    grid-template-columns: 1fr;
+    padding: var(--space-md);
+  }
+  .lecture-summary-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+  .log-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .search-input-wrap {
+    grid-template-columns: 1fr;
+  }
+  .mastery-control-row {
+    grid-template-columns: 1fr 84px;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 640px) {
+  .timer-card {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+<style>
+#cloud-sync-bar{position:sticky;top:0;z-index:9999;background:#e9f1ff;color:#153d82;border-bottom:1px solid #b5cbf5;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:14px system-ui,sans-serif}
+#cloud-sync-bar button{background:#235cbb;color:white;border:0;border-radius:8px;padding:8px 13px;cursor:pointer;font-weight:700}
+#cloud-sync-status{flex:1;min-width:190px}
+</style>
+<script>
+(function(){
+const KEY='takken-blue-study-state-v1';
+let last=null;
+try{last=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+window.studyCloud={user:null,db:null,save:null};
+window.notebookAppApi={
+ async getAppState(){return last},
+ async setAppState(state){
+   last=JSON.parse(JSON.stringify(state));
+   localStorage.setItem(KEY,JSON.stringify(last));
+   if(window.studyCloud.user && window.studyCloud.save){window.studyCloud.save(last)}
+ },
+ triggerFileDownload({content,contentType,filename}){
+   const url=URL.createObjectURL(new Blob([content],{type:contentType||'application/json'}));
+   const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);
+ },
+ notifyAppReady(){}
+};
+window.studyCloudApply=function(data){
+ if(!data || !data.lectures || typeof data.lectures!=='object')return;
+ last=JSON.parse(JSON.stringify(data));
+ localStorage.setItem(KEY,JSON.stringify(last));
+ appState.lectures=data.lectures;
+ if(['kenri','hourei','gyouhou','dashboard','sync'].includes(data.activeView))appState.activeView=data.activeView;
+ render();
+};
+window.studyCloudStatus=function(message){const el=document.getElementById('cloud-sync-status');if(el)el.textContent=message};
+})();
+</script>
+</head>
+<body>
+<div id="cloud-sync-bar"><button id="cloud-login-button" type="button">Googleでログイン・同期</button><span id="cloud-sync-status">端末内に自動保存・Firebase接続待機中…</span></div>
+<div class="page-shell">
+  <div class="page-grid">
+    <header class="app-header">
+      <div class="title-block">
+        <p class="kicker">2026年 宅建試験対策カリキュラム対応</p>
+        <h1 class="title">宅建 学習進捗・理解度ナビ</h1>
+        <p class="lede">「権利関係（全31講・目標90分）→ 法令上の制限 → 宅建業法」の目次順で、黒太文字の記憶想起と自分の言葉での音声アウトプットを管理します。</p>
+      </div>
+
+      <section class="timer-card" aria-label="集中タイマー">
+        <div>
+          <div class="kpi-label">集中タイマー</div>
+          <div class="timer-readout" id="timer-display">05:00</div>
+        </div>
+        <div class="timer-controls">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="setTimerPreset(5)">5分</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="setTimerPreset(15)">15分</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="setTimerPreset(25)">25分</button>
+          <button type="button" class="btn btn-primary btn-sm" id="timer-toggle-btn" onclick="toggleTimer()">開始</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetTimer()">リセット</button>
+        </div>
+      </section>
+    </header>
+
+    <nav class="desktop-nav" aria-label="メインナビゲーション">
+      <button type="button" class="nav-tab is-active" id="tab-kenri" onclick="switchView('kenri')">
+        <span>① 権利関係</span>
+        <span class="nav-count" id="nav-count-kenri">0/31</span>
+      </button>
+      <button type="button" class="nav-tab" id="tab-hourei" onclick="switchView('hourei')">
+        <span>② 法令上の制限</span>
+        <span class="nav-count" id="nav-count-hourei">0/13</span>
+      </button>
+      <button type="button" class="nav-tab" id="tab-gyouhou" onclick="switchView('gyouhou')">
+        <span>③ 宅建業法</span>
+        <span class="nav-count" id="nav-count-gyouhou">0/13</span>
+      </button>
+      <button type="button" class="nav-tab" id="tab-dashboard" onclick="switchView('dashboard')">
+        <span>進捗グラフ</span>
+      </button>
+      <button type="button" class="nav-tab" id="tab-sync" onclick="switchView('sync')">
+        <span>同期・バックアップ</span>
+      </button>
+    </nav>
+
+    <section class="kpi-grid" id="global-kpi-strip" aria-label="学習サマリー">
+      <div class="status-card" id="kpi-card-progress" data-status="idle">
+        <p class="kpi-label">全体進捗率（3科目）</p>
+        <p class="kpi-value" id="kpi-progress-val">0% (0/57講)</p>
+        <p class="kpi-sub" id="kpi-progress-sub">まずは第1講またはAAランクから記録</p>
+      </div>
+      <div class="status-card" id="kpi-card-mastery" data-status="idle">
+        <p class="kpi-label">平均 黒太文字理解度</p>
+        <p class="kpi-value" id="kpi-mastery-val">0%</p>
+        <p class="kpi-sub" id="kpi-mastery-sub">合格目安ライン：80%以上</p>
+      </div>
+      <div class="status-card" id="kpi-card-kenri-time" data-status="idle">
+        <p class="kpi-label">権利関係 90分目標比較</p>
+        <p class="kpi-value" id="kpi-kenri-time-val">0 / 90分</p>
+        <p class="kpi-sub" id="kpi-kenri-time-sub">全31講 合計1時間30分目標</p>
+      </div>
+      <div class="status-card" id="kpi-card-streak" data-status="idle">
+        <p class="kpi-label">総読書時間・連続日数</p>
+        <p class="kpi-value" id="kpi-total-time-val">0分（0日）</p>
+        <p class="kpi-sub" id="kpi-streak-sub">音声解説メモ：0件</p>
+      </div>
+    </section>
+
+    <main id="main-content"></main>
+
+    <footer class="app-footer">
+      <span>科目・講構成出典：2026年 宅建試験テキスト目次（権利関係31講・法令上の制限13講・宅建業法13講）</span>
+      <span>保存先：アプリ内セッション同期（JSONバックアップ対応）</span>
+    </footer>
+  </div>
+
+  <nav class="mobile-dock" aria-label="モバイルナビゲーション">
+    <button type="button" class="dock-btn is-active" id="dock-kenri" onclick="switchView('kenri')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+      <span>権利関係</span>
+    </button>
+    <button type="button" class="dock-btn" id="dock-hourei" onclick="switchView('hourei')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span>法令制限</span>
+    </button>
+    <button type="button" class="dock-btn" id="dock-gyouhou" onclick="switchView('gyouhou')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
+      <span>宅建業法</span>
+    </button>
+    <button type="button" class="dock-btn" id="dock-dashboard" onclick="switchView('dashboard')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      <span>グラフ</span>
+    </button>
+    <button type="button" class="dock-btn" id="dock-sync" onclick="switchView('sync')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>同期</span>
+    </button>
+  </nav>
+</div>
+
+<api-shim></api-shim>
+
+<script>
+// Curriculum Master Data (Order strictly fixed as specified)
+const SUBJECTS = [
+  {
+    id: `kenri`,
+    order: 1,
+    name: `① 権利関係`,
+    shortName: `権利関係`,
+    targetTotalMin: 90,
+    description: `全31講・目次順固定表示。AA/Aランクを中心に合計90分（1時間30分）での通読と理解定着を目指します。`
+  },
+  {
+    id: `hourei`,
+    order: 2,
+    name: `② 法令上の制限`,
+    shortName: `法令上の制限`,
+    targetTotalMin: 53,
+    description: `全13講（都市計画法・建築基準法・農地法・国土法・盛土規制法・税・鑑定評価）。制度の数値と手続きを比較整理します。`
+  },
+  {
+    id: `gyouhou`,
+    order: 3,
+    name: `③ 宅建業法`,
+    shortName: `宅建業法`,
+    targetTotalMin: 76,
+    description: `全13講（免許・取引士・35条・37条・8種制限・報酬）。満点近くを狙う得点源科目です。`
+  }
+];
+
+const CURRICULUM = [
+  // ① 権利関係（第1講〜第31講・目標合計90分）
+  { id: `kenri-1`, subject: `kenri`, num: 1, rank: `B`, title: `契約の成立`, page: `P.1-1〜`, targetMin: 3, keywords: [`申込み`, `承諾`, `意思表示`, `合致`, `到達した時`, `書面不要`, `特約`] },
+  { id: `kenri-2`, subject: `kenri`, num: 2, rank: `A`, title: `能力`, page: `P.2-1〜`, targetMin: 3, keywords: [`制限行為能力者`, `未成年者`, `成年被後見人`, `被保佐人`, `被補助人`, `取消し`, `追認`, `催告権`] },
+  { id: `kenri-3`, subject: `kenri`, num: 3, rank: `A`, title: `意思表示`, page: `P.3-1〜`, targetMin: 3, keywords: [`心裡留保`, `虚偽表示`, `無効`, `錯誤`, `詐欺`, `強迫`, `善意`, `悪意`, `過失`] },
+  { id: `kenri-4`, subject: `kenri`, num: 4, rank: `A`, title: `代理`, page: `P.4-1〜`, targetMin: 3, keywords: [`代理権`, `顕名`, `無権代理`, `追認`, `催告`, `取消し`, `表見代理`, `自己契約`, `双方代理`] },
+  { id: `kenri-5`, subject: `kenri`, num: 5, rank: `A`, title: `時効`, page: `P.5-1〜`, targetMin: 3, keywords: [`取得時効`, `消滅時効`, `所有の意思`, `平穏・公然`, `善意・無過失`, `時効の更新`, `完成猶予`, `援用`] },
+  { id: `kenri-6`, subject: `kenri`, num: 6, rank: `C`, title: `条件・期限`, page: `P.6-1〜`, targetMin: 1, keywords: [`停止条件`, `解除条件`, `確定期限`, `不確定期限`, `期限の利益`] },
+  { id: `kenri-7`, subject: `kenri`, num: 7, rank: `B`, title: `相隣関係`, page: `P.7-1〜`, targetMin: 2, keywords: [`竹木の枝`, `竹木の根`, `催告`, `急迫の事情`, `囲繞地通行権`, `ライフライン設備`] },
+  { id: `kenri-8`, subject: `kenri`, num: 8, rank: `B`, title: `共有 ～所有者不明土地・建物管理命令～`, page: `P.8-1〜`, targetMin: 3, keywords: [`共有持分`, `保存行為`, `管理行為`, `変更行為`, `持分の放棄`, `共有物分割`, `現物分割`, `賠償分割`] },
+  { id: `kenri-9`, subject: `kenri`, num: 9, rank: `AA`, title: `建物区分所有法`, page: `P.9-1〜`, targetMin: 5, keywords: [`区分所有権`, `専有部分`, `共用部分`, `敷地利用権`, `管理者`, `集会の決議`, `規約`, `4分の3以上`, `5分の4以上`, `占有者`, `議決権`] },
+  { id: `kenri-10`, subject: `kenri`, num: 10, rank: `A`, title: `抵当権`, page: `P.10-1〜`, targetMin: 3, keywords: [`抵当権`, `優先弁済権`, `物上代位`, `法定地上権`, `一括競売`, `抵当権消滅請求`, `代価弁済`, `同意の登記`, `6ヶ月明け渡し猶予`] },
+  { id: `kenri-11`, subject: `kenri`, num: 11, rank: `C`, title: `根抵当権`, page: `P.11-1〜`, targetMin: 1, keywords: [`極度額`, `不特定の債権`, `元本確定`, `随伴性なし`, `共有根抵当`] },
+  { id: `kenri-12`, subject: `kenri`, num: 12, rank: `C`, title: `担保物権`, page: `P.12-1〜`, targetMin: 1, keywords: [`留置権`, `先取特権`, `質権`, `付従性`, `不可分性`] },
+  { id: `kenri-13`, subject: `kenri`, num: 13, rank: `B`, title: `保証・連帯保証`, page: `P.13-1〜`, targetMin: 3, keywords: [`書面または電磁的記録`, `補充性`, `催告の抗弁権`, `検索の抗弁権`, `分別の利益`, `連帯保証`, `情報提供義務`, `極度額`] },
+  { id: `kenri-14`, subject: `kenri`, num: 14, rank: `B`, title: `連帯債務・連帯債権`, page: `P.14-1〜`, targetMin: 2, keywords: [`連帯債務`, `書面不要`, `絶対効`, `相対効`, `求償権`, `混同`] },
+  { id: `kenri-15`, subject: `kenri`, num: 15, rank: `B`, title: `債権譲渡 ～コラム：債務引受～`, page: `P.15-1〜`, targetMin: 2, keywords: [`譲渡制限特約`, `対抗要件`, `確定日付ある証書`, `通知・承諾`, `併存的債務引受`, `免責的債務引受`] },
+  { id: `kenri-16`, subject: `kenri`, num: 16, rank: `C`, title: `債権者代位権・詐害行為取消権`, page: `P.16-1〜`, targetMin: 1, keywords: [`債権者代位権`, `無資力要件`, `詐害行為取消権`, `受益者`, `転得者`] },
+  { id: `kenri-17`, subject: `kenri`, num: 17, rank: `A`, title: `債務不履行・危険負担`, page: `P.17-1〜`, targetMin: 3, keywords: [`履行遅滞`, `履行不能`, `帰責事由`, `損害賠償`, `通常損害`, `特別損害`, `危険負担`, `履行拒絶権`] },
+  { id: `kenri-18`, subject: `kenri`, num: 18, rank: `A`, title: `解除`, page: `P.18-1〜`, targetMin: 3, keywords: [`催告解除`, `無催告解除`, `相当期間`, `軽微な不履行`, `原状回復義務`, `第三者保護`, `登記`] },
+  { id: `kenri-19`, subject: `kenri`, num: 19, rank: `C`, title: `弁済`, page: `P.19-1〜`, targetMin: 1, keywords: [`持参債務`, `第三者弁済`, `利害関係`, `弁済の提供`, `受領権者としての外観`] },
+  { id: `kenri-20`, subject: `kenri`, num: 20, rank: `B`, title: `相殺`, page: `P.20-1〜`, targetMin: 2, keywords: [`自働債権`, `受働債権`, `相殺適状`, `同時履行の抗弁権`, `不法行為債権`, `差押え`] },
+  { id: `kenri-21`, subject: `kenri`, num: 21, rank: `AA`, title: `手付 ～コラム：売買・交換・贈与～`, page: `P.21-1〜`, targetMin: 4, keywords: [`解約手付`, `履行の着手`, `手付流し`, `手付倍返し`, `他人物売買`, `数量指示売買`, `贈与の撤回`] },
+  { id: `kenri-22`, subject: `kenri`, num: 22, rank: `AA`, title: `契約不適合責任`, page: `P.22-1〜`, targetMin: 5, keywords: [`追完請求`, `代金減額請求`, `損害賠償請求`, `契約の解除`, `帰責事由`, `1年以内の通知`, `担保責任の特約`, `軽微な不履行`, `買主の帰責事由`] },
+  { id: `kenri-23`, subject: `kenri`, num: 23, rank: `B`, title: `請負`, page: `P.23-1〜`, targetMin: 2, keywords: [`仕事の完成`, `契約不適合責任`, `報酬の後払い`, `注文者の解除権`, `割合に応じた報酬`, `目的物の帰属`] },
+  { id: `kenri-24`, subject: `kenri`, num: 24, rank: `A`, title: `委任 ～コラム：注意義務～`, page: `P.24-1〜`, targetMin: 3, keywords: [`信頼関係`, `善管注意義務`, `自己の財産と同一の注意`, `報告義務`, `引渡義務`, `復委任の原則禁止`, `原則無償`] },
+  { id: `kenri-25`, subject: `kenri`, num: 25, rank: `A`, title: `不法行為 ～コラム：事務管理～`, page: `P.25-1〜`, targetMin: 3, keywords: [`故意・過失`, `使用者責任`, `行為の外形`, `求償権`, `工作物責任`, `共同不法行為`, `消滅時効`, `事務管理`] },
+  { id: `kenri-26`, subject: `kenri`, num: 26, rank: `AA`, title: `相続 ～配偶者居住権と配偶者短期居住権～`, page: `P.26-1〜`, targetMin: 5, keywords: [`法定相続分`, `代襲相続`, `単純承認`, `限定承認`, `相続放棄`, `遺言`, `遺留分侵害額請求`, `配偶者居住権`, `配偶者短期居住権`, `特別寄与料`] },
+  { id: `kenri-27`, subject: `kenri`, num: 27, rank: `A`, title: `物権変動`, page: `P.27-1〜`, targetMin: 3, keywords: [`二重譲渡`, `対抗要件`, `背信的悪意者`, `取消し前の第三者`, `取消し後の第三者`, `時効完成前`, `時効完成後`] },
+  { id: `kenri-28`, subject: `kenri`, num: 28, rank: `AA`, title: `不動産登記法`, page: `P.28-1〜`, targetMin: 4, keywords: [`表題部`, `権利部甲区`, `権利部乙区`, `表示に関する登記`, `権利に関する登記`, `表題部所有者`, `登記名義人`, `1ヶ月以内`, `共同申請`, `仮登記`] },
+  { id: `kenri-29`, subject: `kenri`, num: 29, rank: `AA`, title: `賃貸借・使用貸借 ～地上権～`, page: `P.29-1〜`, targetMin: 4, keywords: [`賃借権の対抗力`, `必要費`, `有益費`, `無断譲渡・転貸`, `背信行為と認めるに足りない特段の事情`, `敷金`, `使用貸借`, `地上権`] },
+  { id: `kenri-30`, subject: `kenri`, num: 30, rank: `AA`, title: `借地借家法（借家）`, page: `P.30-1〜`, targetMin: 5, keywords: [`建物の引渡し`, `正当事由`, `法定更新`, `造作買取請求権`, `定期建物賃貸借`, `公正証書等の書面`, `事前説明書交付`, `中途解約`, `取り壊し予定`] },
+  { id: `kenri-31`, subject: `kenri`, num: 31, rank: `AA`, title: `借地借家法（借地）`, page: `P.31-1〜`, targetMin: 4, keywords: [`借地権の存続期間`, `30年`, `20年・10年`, `建物の登記`, `建物買取請求権`, `借地権の譲渡・転貸`, `一般定期借地権`, `事業用定期借地権`, `公正証書に限る`] },
+
+  // ② 法令上の制限（第1講〜第13講）
+  { id: `hourei-1`, subject: `hourei`, num: 1, rank: `B`, title: `法令上の制限 全体像を理解しよう！`, page: `P.1-1〜`, targetMin: 2, keywords: [`都市計画法`, `建築基準法`, `農地法`, `国土利用計画法`, `盛土規制法`] },
+  { id: `hourei-2`, subject: `hourei`, num: 2, rank: `A`, title: `都市計画法１ 都市計画`, page: `P.2-1〜`, targetMin: 4, keywords: [`都市計画区域`, `準都市計画区域`, `市街化区域`, `市街化調整区域`, `非線引き区域`, `用途地域`, `地区計画`, `都市施設`] },
+  { id: `hourei-3`, subject: `hourei`, num: 3, rank: `AA`, title: `都市計画法２ 開発行為`, page: `P.3-1〜`, targetMin: 6, keywords: [`開発行為`, `区画形質の変更`, `開発許可`, `1,000㎡以上`, `3,000㎡以上`, `10,000㎡以上`, `市街化調整区域内の建築制限`, `建築許可`, `工事完了公告`, `開発登録簿`] },
+  { id: `hourei-4`, subject: `hourei`, num: 4, rank: `B`, title: `建築基準法１ 建築確認・単体規定など`, page: `P.4-1〜`, targetMin: 3, keywords: [`建築確認`, `特殊建築物`, `200㎡を超える`, `木造2階`, `完了検査`, `検査済証`, `単体規定`, `避難規定`] },
+  { id: `hourei-5`, subject: `hourei`, num: 5, rank: `B`, title: `建築基準法２ 集団規定`, page: `P.5-1〜`, targetMin: 4, keywords: [`道路の定義`, `4m以上`, `2m接道義務`, `用途規制`, `建蔽率`, `容積率`, `高さ制限`, `防火地域`, `準防火地域`] },
+  { id: `hourei-6`, subject: `hourei`, num: 6, rank: `AA`, title: `農地法`, page: `P.6-1〜`, targetMin: 5, keywords: [`農地`, `採草放牧地`, `3条許可`, `4条許可`, `5条許可`, `農業委員会`, `都道府県知事`, `市街化区域内届出`] },
+  { id: `hourei-7`, subject: `hourei`, num: 7, rank: `AA`, title: `国土利用計画法`, page: `P.7-1〜`, targetMin: 5, keywords: [`事後届出制`, `事前届出制`, `2,000㎡`, `5,000㎡`, `10,000㎡`, `契約締結日から2週間以内`, `利用目的`, `勧告`, `公表`] },
+  { id: `hourei-8`, subject: `hourei`, num: 8, rank: `AA`, title: `宅地造成及び特定盛土等規制法（盛土規制法）`, page: `P.8-1〜`, targetMin: 5, keywords: [`宅地造成等工事規制区域`, `特定盛土等規制区域`, `知事の許可`, `特定盛土の届出`, `完了検査`, `中間検査`, `定期報告`] },
+  { id: `hourei-9`, subject: `hourei`, num: 9, rank: `A`, title: `土地区画整理法`, page: `P.9-1〜`, targetMin: 4, keywords: [`仮換地`, `換地処分`, `換地処分の公告`, `保留地`, `建築行為等の制限`, `土地区画整理組合`, `清算法人`] },
+  { id: `hourei-10`, subject: `hourei`, num: 10, rank: `B`, title: `諸法令`, page: `P.10-1〜`, targetMin: 2, keywords: [`津波防災地域づくり法`, `土砂災害防止法`, `急傾斜地法`, `生産緑地法`, `景観法`] },
+  { id: `hourei-11`, subject: `hourei`, num: 11, rank: `B`, title: `国税（譲渡所得税、登録免許税、贈与税、印紙税）`, page: `P.11-1〜`, targetMin: 3, keywords: [`譲渡所得税`, `3,000万円特別控除`, `長期譲渡所得`, `登録免許税`, `贈与税`, `相続時精算課税制度`, `印紙税`, `過怠税`] },
+  { id: `hourei-12`, subject: `hourei`, num: 12, rank: `AA`, title: `地方税（不動産取得税・固定資産税）`, page: `P.12-1〜`, targetMin: 5, keywords: [`不動産取得税`, `固定資産税課税台帳`, `標準税率`, `1,200万円控除`, `住宅用地の特例`, `1月1日現在の所有者`, `1.4%`, `免税点`] },
+  { id: `hourei-13`, subject: `hourei`, num: 13, rank: `A`, title: `地価公示・鑑定評価`, page: `P.13-1〜`, targetMin: 3, keywords: [`地価公示法`, `標準地`, `規準`, `±20%程度`, `不動産鑑定士`, `取引事例比較法`, `収益還元法`] },
+
+  // ③ 宅建業法（第1講〜第13講）
+  { id: `gyouhou-1`, subject: `gyouhou`, num: 1, rank: `A`, title: `宅地建物取引業法の全体像`, page: `P.1-1〜`, targetMin: 3, keywords: [`宅地`, `建物`, `取引`, `業として`, `消費者保護`] },
+  { id: `gyouhou-2`, subject: `gyouhou`, num: 2, rank: `AA`, title: `宅地建物取引業とは？`, page: `P.2-1〜`, targetMin: 5, keywords: [`宅地の定義`, `建物の定義`, `取引の態様`, `自ら貸借は対象外`, `転貸も対象外`, `不特定多数`, `反復継続`, `国・地方公共団体`] },
+  { id: `gyouhou-3`, subject: `gyouhou`, num: 3, rank: `AA`, title: `宅地建物取引業者（宅建業者）`, page: `P.3-1〜`, targetMin: 6, keywords: [`国土交通大臣免許`, `知事免許`, `有効期間5年`, `欠格事由`, `標識の掲示`, `案内所の届出`, `専任の宅建取引士`, `5人に1人以上`, `廃業等の届出`, `破産管財人`] },
+  { id: `gyouhou-4`, subject: `gyouhou`, num: 4, rank: `AA`, title: `宅地建物取引士（宅建取引士）`, page: `P.4-1〜`, targetMin: 6, keywords: [`登録`, `宅地建物取引士証`, `5年更新`, `法定講習`, `専任の取引士`, `記名`, `説明`, `取引士証の提示`, `本人による破産届出`] },
+  { id: `gyouhou-5`, subject: `gyouhou`, num: 5, rank: `AA`, title: `保証金（営業保証金・保証協会）`, page: `P.5-1〜`, targetMin: 6, keywords: [`営業保証金`, `主たる事務所1,000万円`, `従たる事務所500万円`, `供託所`, `保証協会`, `弁済業務保証金分担金`, `60万円・30万円`, `還付請求`, `二重加入禁止`] },
+  { id: `gyouhou-6`, subject: `gyouhou`, num: 6, rank: `AA`, title: `媒介契約の規制`, page: `P.6-1〜`, targetMin: 6, keywords: [`一般媒介契約`, `専任媒介契約`, `専属専任媒介契約`, `有効期間3ヶ月`, `7日以内・5日以内`, `指定流通機構`, `業務処理状況報告`, `2週間に1回・1週間に1回`, `34条の2書面`] },
+  { id: `gyouhou-7`, subject: `gyouhou`, num: 7, rank: `AA`, title: `重要事項の説明`, page: `P.7-1〜`, targetMin: 8, keywords: [`35条書面`, `契約成立前`, `宅建士が記名・説明`, `取引士証の提示`, `代金・借賃以外`, `水害ハザードマップ`, `石綿・耐震診断`, `建物状況調査`, `区分所有建物`, `貸借で不要な事項`, `信託の受益権`] },
+  { id: `gyouhou-8`, subject: `gyouhou`, num: 8, rank: `AA`, title: `37条書面（契約書）`, page: `P.8-1〜`, targetMin: 7, keywords: [`契約成立後`, `遅滞なく交付`, `宅建士の記名`, `説明不要`, `売主・買主双方に交付`, `必要的記載事項`, `任意的記載事項`, `代金・借賃の額`, `引渡しの時期`] },
+  { id: `gyouhou-9`, subject: `gyouhou`, num: 9, rank: `AA`, title: `自ら売主・８種制限`, page: `P.9-1〜`, targetMin: 8, keywords: [`宅建業者間は適用除外`, `他人物売買`, `クーリング・オフ`, `損害賠償額の予定`, `手付金の額の制限`, `手付金等の保全措置`, `未完成5%・1,000万円`, `完成10%・1,000万円`, `担保責任の特約制限`, `割賦販売`, `所有権留保`] },
+  { id: `gyouhou-10`, subject: `gyouhou`, num: 10, rank: `AA`, title: `報酬額の制限`, page: `P.10-1〜`, targetMin: 6, keywords: [`消費税10%`, `建物のみ課税`, `土地非課税`, `速算式`, `代理は2倍まで`, `低廉な空家等の特例`, `貸借の報酬`, `居住用建物0.55ヶ月`, `権利金の特例`] },
+  { id: `gyouhou-11`, subject: `gyouhou`, num: 11, rank: `AA`, title: `業務上の諸規制`, page: `P.11-1〜`, targetMin: 5, keywords: [`誇大広告等の禁止`, `広告開始時期の制限`, `取引態様の明示`, `守秘義務`, `手付貸与の禁止`, `断定的判断の提供禁止`, `帳簿の備付け`, `従業者名簿`] },
+  { id: `gyouhou-12`, subject: `gyouhou`, num: 12, rank: `AA`, title: `監督処分・罰則`, page: `P.12-1〜`, targetMin: 5, keywords: [`指示処分`, `業務停止処分`, `免許取消処分`, `聴聞`, `公告`, `事務禁止処分`, `登録消除処分`] },
+  { id: `gyouhou-13`, subject: `gyouhou`, num: 13, rank: `AA`, title: `住宅瑕疵担保履行法`, page: `P.13-1〜`, targetMin: 5, keywords: [`新築住宅`, `構造耐力上主要な部分`, `雨水の浸入を防止する部分`, `引渡しから10年間`, `保証金の供託`, `保険への加入`] }
+];
+
+// Application Runtime State (Clean empty defaults)
+let appState = {
+  activeView: `kenri`,
+  rankFilter: `ALL`,
+  statusFilter: `ALL`,
+  searchQuery: ``,
+  expandedId: null,
+  revealedKw: {},
+  lectures: {}
+};
+
+// Session-only volatile state (not persisted in setAppState)
+let activeRecordingId = null;
+let mediaRecorder = null;
+let mediaStream = null;
+let audioChunks = [];
+let speechRec = null;
+let recSeconds = 0;
+let recInterval = null;
+let analyserNode = null;
+let audioCtx = null;
+let waveAnimId = null;
+let sessionAudioUrls = {};
+let liveTranscriptDrafts = {};
+let chartInstances = {};
+
+// Study Timer State
+let timerSeconds = 300;
+let timerInitialSeconds = 300;
+let timerRunning = false;
+let timerInterval = null;
+
+// Inline messages map
+let uiMessages = {};
+
+function getTodayStr() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, `0`);
+  const d = String(now.getDate()).padStart(2, `0`);
+  return `${y}-${m}-${d}`;
+}
+
+function getLectureState(id) {
+  const def = CURRICULUM.find(c => c.id === id);
+  const existing = appState.lectures[id] || {};
+  return {
+    mastery: typeof existing.mastery === `number` ? existing.mastery : 0,
+    logs: Array.isArray(existing.logs) ? existing.logs : [],
+    memos: Array.isArray(existing.memos) ? existing.memos : [],
+    checkedKw: Array.isArray(existing.checkedKw) ? existing.checkedKw : [],
+    customKw: Array.isArray(existing.customKw) ? existing.customKw : [],
+    kwCountOverride: typeof existing.kwCountOverride === `number` ? existing.kwCountOverride : null,
+    pageOverride: typeof existing.pageOverride === `string` ? existing.pageOverride : null,
+    targetMinOverride: typeof existing.targetMinOverride === `number` ? existing.targetMinOverride : null,
+    baseKeywords: def ? def.keywords : []
+  };
+}
+
+function getEffectiveKeywords(item) {
+  const st = getLectureState(item.id);
+  return [...item.keywords, ...st.customKw];
+}
+
+function getEffectiveKwCount(item) {
+  const st = getLectureState(item.id);
+  if (st.kwCountOverride !== null) return st.kwCountOverride;
+  return item.keywords.length + st.customKw.length;
+}
+
+function getEffectivePage(item) {
+  const st = getLectureState(item.id);
+  return st.pageOverride !== null && st.pageOverride.trim() !== `` ? st.pageOverride : item.page;
+}
+
+function getEffectiveTargetMin(item) {
+  const st = getLectureState(item.id);
+  return st.targetMinOverride !== null ? st.targetMinOverride : item.targetMin;
+}
+
+function getLectureMinutes(id) {
+  const st = getLectureState(id);
+  return st.logs.reduce((sum, l) => sum + (Number(l.minutes) || 0), 0);
+}
+
+function getLectureLatestDate(id) {
+  const st = getLectureState(id);
+  if (st.logs.length === 0) return null;
+  const sorted = [...st.logs].sort((a, b) => (b.date || ``).localeCompare(a.date || ``));
+  return sorted[0].date || null;
+}
+
+function getLectureStatus(id) {
+  const st = getLectureState(id);
+  const mins = getLectureMinutes(id);
+  if (st.mastery >= 80) return `ok`;
+  if (mins === 0 && st.mastery === 0 && st.memos.length === 0) return `idle`;
+  if (st.mastery < 50 && (mins > 0 || st.memos.length > 0)) return `alert`;
+  if (st.mastery < 80) return `warn`;
+  return `progress`;
+}
+
+function isLectureStudied(id) {
+  const st = getLectureState(id);
+  return st.logs.length > 0 || st.mastery > 0 || st.memos.length > 0;
+}
+
+async function persistState() {
+  try {
+    if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+      await window.notebookAppApi.setAppState({
+        activeView: appState.activeView,
+        lectures: appState.lectures
+      });
+    }
+  } catch (err) {
+    setInlineMsg(`global`, `状態の保存に失敗しました: ${err.message || `通信エラー`}`, true);
+  }
+}
+
+function setInlineMsg(key, text, isError = false, isOk = false) {
+  uiMessages[key] = { text, isError, isOk };
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, `&amp;`)
+    .replace(/</g, `&lt;`)
+    .replace(/>/g, `&gt;`)
+    .replace(/"/g, `&quot;`)
+    .replace(/'/g, `&#39;`);
+}
+
+function formatDateJP(isoDate) {
+  if (!isoDate) return `未記録`;
+  const parts = isoDate.split(`-`);
+  if (parts.length !== 3) return isoDate;
+  return `${Number(parts[1])}月${Number(parts[2])}日`;
+}
+
+// Compute overall KPIs and streak
+function computeSummaryStats() {
+  let studiedCount = 0;
+  let masterySum = 0;
+  let totalMin = 0;
+  let totalMemos = 0;
+  let kenriActualMin = 0;
+  let kenriTargetMin = 0;
+  const dateMap = {};
+
+  const bySubject = {};
+  SUBJECTS.forEach(s => {
+    bySubject[s.id] = { total: 0, studied: 0, masterySum: 0, actualMin: 0, targetMin: 0 };
+  });
+
+  CURRICULUM.forEach(item => {
+    const st = getLectureState(item.id);
+    const mins = getLectureMinutes(item.id);
+    const studied = isLectureStudied(item.id);
+    const targetM = getEffectiveTargetMin(item);
+
+    bySubject[item.subject].total += 1;
+    bySubject[item.subject].actualMin += mins;
+    bySubject[item.subject].targetMin += targetM;
+    bySubject[item.subject].masterySum += st.mastery;
+    if (studied) {
+      bySubject[item.subject].studied += 1;
+      studiedCount += 1;
+    }
+
+    if (item.subject === `kenri`) {
+      kenriActualMin += mins;
+      kenriTargetMin += targetM;
+    }
+
+    masterySum += st.mastery;
+    totalMin += mins;
+    totalMemos += st.memos.length;
+
+    st.logs.forEach(l => {
+      if (l.date) {
+        dateMap[l.date] = (dateMap[l.date] || 0) + (Number(l.minutes) || 0);
+      }
+    });
+  });
+
+  // Streak calculation from unique logged dates
+  const dates = Object.keys(dateMap).sort();
+  let streak = 0;
+  if (dates.length > 0) {
+    let cursor = new Date(`${dates[dates.length - 1]}T00:00:00`);
+    const dateSet = new Set(dates);
+    while (true) {
+      const y = cursor.getFullYear();
+      const m = String(cursor.getMonth() + 1).padStart(2, `0`);
+      const d = String(cursor.getDate()).padStart(2, `0`);
+      const key = `${y}-${m}-${d}`;
+      if (dateSet.has(key)) {
+        streak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+  }
+
+  return {
+    totalLectures: CURRICULUM.length,
+    studiedCount,
+    progressPct: Math.round((studiedCount / CURRICULUM.length) * 100),
+    avgMastery: Math.round(masterySum / CURRICULUM.length),
+    totalMin,
+    totalMemos,
+    kenriActualMin,
+    kenriTargetMin,
+    streak,
+    studyDays: dates.length,
+    dateMap,
+    bySubject
+  };
+}
+
+// Timer Controls
+function setTimerPreset(mins) {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerInitialSeconds = mins * 60;
+  timerSeconds = mins * 60;
+  updateTimerDisplay();
+}
+
+function toggleTimer() {
+  const btn = document.getElementById(`timer-toggle-btn`);
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    if (btn) btn.textContent = `再開`;
+  } else {
+    timerRunning = true;
+    if (btn) btn.textContent = `一時停止`;
+    timerInterval = setInterval(() => {
+      if (timerSeconds > 0) {
+        timerSeconds -= 1;
+        updateTimerDisplay();
+      } else {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        if (btn) btn.textContent = `完了！`;
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = timerInitialSeconds;
+  const btn = document.getElementById(`timer-toggle-btn`);
+  if (btn) btn.textContent = `開始`;
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById(`timer-display`);
+  if (!el) return;
+  const m = String(Math.floor(timerSeconds / 60)).padStart(2, `0`);
+  const s = String(timerSeconds % 60).padStart(2, `0`);
+  el.textContent = `${m}:${s}`;
+}
+
+// Navigation
+function switchView(viewId) {
+  appState.activeView = viewId;
+  persistState();
+  render();
+  window.scrollTo({ top: 0, behavior: `smooth` });
+}
+
+function jumpToLecture(id) {
+  const item = CURRICULUM.find(c => c.id === id);
+  if (!item) return;
+  appState.activeView = item.subject;
+  appState.rankFilter = `ALL`;
+  appState.statusFilter = `ALL`;
+  appState.searchQuery = ``;
+  appState.expandedId = id;
+  render();
+  setTimeout(() => {
+    const el = document.getElementById(`card-${id}`);
+    if (el) el.scrollIntoView({ behavior: `smooth`, block: `start` });
+  }, 60);
+}
+
+// Filter Controls
+function setRankFilter(rank) {
+  appState.rankFilter = rank;
+  render();
+}
+
+function setStatusFilter(st) {
+  appState.statusFilter = st;
+  render();
+}
+
+function onSearchInput(val) {
+  appState.searchQuery = val;
+  renderMainOnly();
+}
+
+function clearFilters() {
+  appState.rankFilter = `ALL`;
+  appState.statusFilter = `ALL`;
+  appState.searchQuery = ``;
+  render();
+}
+
+function toggleExpand(id) {
+  appState.expandedId = appState.expandedId === id ? null : id;
+  render();
+}
+
+// Keyword Recall Actions
+function toggleRevealKw(id) {
+  appState.revealedKw[id] = !appState.revealedKw[id];
+  render();
+}
+
+function toggleKeywordCheck(id, kw) {
+  const st = getLectureState(id);
+  const exists = st.checkedKw.includes(kw);
+  const nextChecked = exists ? st.checkedKw.filter(k => k !== kw) : [...st.checkedKw, kw];
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].checkedKw = nextChecked;
+  persistState();
+  render();
+}
+
+function adjustKwCount(id, delta) {
+  const item = CURRICULUM.find(c => c.id === id);
+  if (!item) return;
+  const current = getEffectiveKwCount(item);
+  const next = Math.max(0, current + delta);
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].kwCountOverride = next;
+  persistState();
+  render();
+}
+
+function addCustomKeyword(id) {
+  const input = document.getElementById(`custom-kw-input-${id}`);
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  const st = getLectureState(id);
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  if (!st.customKw.includes(val)) {
+    appState.lectures[id].customKw = [...st.customKw, val];
+    appState.revealedKw[id] = true;
+    persistState();
+  }
+  input.value = ``;
+  render();
+}
+
+function updatePageOverride(id, val) {
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].pageOverride = val.trim();
+  persistState();
+  const badge = document.getElementById(`page-badge-${id}`);
+  if (badge) badge.textContent = val.trim() || (CURRICULUM.find(c => c.id === id) || {}).page || ``;
+}
+
+// Study Log Actions
+function setLogDateQuick(id, offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, `0`);
+  const day = String(d.getDate()).padStart(2, `0`);
+  const input = document.getElementById(`log-date-${id}`);
+  if (input) input.value = `${y}-${m}-${day}`;
+}
+
+function bumpLogMinutes(id, addMin) {
+  const input = document.getElementById(`log-min-${id}`);
+  if (!input) return;
+  const cur = Number(input.value) || 0;
+  input.value = Math.max(1, cur + addMin);
+}
+
+function addStudyLog(id) {
+  const dateEl = document.getElementById(`log-date-${id}`);
+  const minEl = document.getElementById(`log-min-${id}`);
+  if (!dateEl || !minEl) return;
+  const dateVal = dateEl.value || getTodayStr();
+  const minVal = Math.max(1, Math.round(Number(minEl.value) || 0));
+  if (!minVal) {
+    setInlineMsg(`log-${id}`, `読書時間（分）を1分以上で入力してください。`, true);
+    render();
+    return;
+  }
+  const st = getLectureState(id);
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].logs = [...st.logs, { date: dateVal, minutes: minVal }];
+  setInlineMsg(`log-${id}`, `${formatDateJP(dateVal)} に ${minVal}分 を記録しました。`, false, true);
+  persistState();
+  render();
+}
+
+function deleteStudyLog(id, idx) {
+  const st = getLectureState(id);
+  const next = st.logs.filter((_, i) => i !== idx);
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].logs = next;
+  persistState();
+  render();
+}
+
+// Dual-input Slider/Number Sync for Mastery %
+function updateMasteryVisuals(id, num) {
+  const pct = Math.min(100, Math.max(0, Math.round(Number(num) || 0)));
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].mastery = pct;
+  persistState();
+
+  const pctLabel = document.getElementById(`mastery-pct-${id}`);
+  if (pctLabel) pctLabel.textContent = `${pct}%`;
+
+  const fill = document.getElementById(`mastery-fill-${id}`);
+  if (fill) {
+    fill.style.width = `${pct}%`;
+    fill.setAttribute(`data-status`, pct >= 80 ? `ok` : (pct >= 50 ? `warn` : `alert`));
+  }
+  const card = document.getElementById(`card-${id}`);
+  if (card) {
+    card.setAttribute(`data-status`, getLectureStatus(id));
+  }
+  updateGlobalKpisOnly();
+}
+
+function onMasterySliderInput(id, val) {
+  const numEl = document.getElementById(`mastery-num-${id}`);
+  if (numEl) numEl.value = val;
+  updateMasteryVisuals(id, val);
+}
+
+function onMasteryNumberInput(id, val) {
+  const clamped = Math.min(100, Math.max(0, Number(val) || 0));
+  const sliderEl = document.getElementById(`mastery-slider-${id}`);
+  if (sliderEl) sliderEl.value = clamped;
+  updateMasteryVisuals(id, clamped);
+}
+
+function setMasteryQuick(id, val) {
+  const sliderEl = document.getElementById(`mastery-slider-${id}`);
+  const numEl = document.getElementById(`mastery-num-${id}`);
+  if (sliderEl) sliderEl.value = val;
+  if (numEl) numEl.value = val;
+  updateMasteryVisuals(id, val);
+  render();
+}
+
+// Voice Memo & AI Listening Comprehension Evaluator
+async function startVoiceMemo(id) {
+  if (activeRecordingId && activeRecordingId !== id) {
+    stopVoiceMemo(activeRecordingId, false);
+  }
+  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+    setInlineMsg(`voice-${id}`, `マイクが利用できません。HTTPSの公開ページをChromeまたはEdgeで開き、マイクを許可してください。`, true);
+    render();
+    return;
+  }
+  activeRecordingId = id;
+  recSeconds = 0;
+  audioChunks = [];
+  if (!liveTranscriptDrafts[id]) liveTranscriptDrafts[id] = ``;
+  setInlineMsg(`voice-${id}`, ``, false, false);
+
+  let micAvailable = false;
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micAvailable = true;
+      mediaRecorder = new MediaRecorder(mediaStream);
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) audioChunks.push(e.data);
+      };
+      mediaRecorder.onstop = () => {
+        if (audioChunks.length > 0) {
+          const blob = new Blob(audioChunks, { type: `audio/webm` });
+          sessionAudioUrls[id] = URL.createObjectURL(blob);
+        }
+        render();
+      };
+      mediaRecorder.start();
+
+      // Waveform analyser
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        audioCtx = new AudioCtx();
+        const source = audioCtx.createMediaStreamSource(mediaStream);
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 64;
+        source.connect(analyserNode);
+      }
+    }
+  } catch (err) {
+    micAvailable = false;
+    activeRecordingId = null;
+    setInlineMsg(
+      `voice-${id}`,
+      `マイクが許可されないか端末で制限されています。下の入力欄に説明を直接入力（または音声入力機能を使用）して「AIリスニング診断」を実行できます。`,
+      true
+    );
+  }
+
+  if (!micAvailable) { render(); return; }
+
+  // Speech Recognition (Web Speech API ja-JP)
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRec && micAvailable) {
+    try {
+      speechRec = new SpeechRec();
+      speechRec.lang = `ja-JP`;
+      speechRec.continuous = true;
+      speechRec.interimResults = true;
+      let committed = liveTranscriptDrafts[id] ? `${liveTranscriptDrafts[id]} ` : ``;
+      speechRec.onresult = (event) => {
+        let interim = ``;
+        for (let i = 0; i < event.results.length; i += 1) {
+          const text = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            interim += text;
+          } else {
+            interim += text;
+          }
+        }
+        liveTranscriptDrafts[id] = `${committed}${interim}`.trim();
+        const ta = document.getElementById(`transcript-${id}`);
+        if (ta) ta.value = liveTranscriptDrafts[id];
+      };
+      speechRec.onerror = (e) => { setInlineMsg(`voice-${id}`, `文字起こしに失敗しました（${e.error || '不明'}）。録音した音声は停止後に再生できます。`, true); };
+      speechRec.start();
+    } catch (e) {}
+  } else if (micAvailable) {
+    setInlineMsg(
+      `voice-${id}`,
+      `録音中です（音声の自動文字起こし非対応ブラウザの場合は、停止後に要約をテキスト入力してAI診断できます）。`,
+      false,
+      false
+    );
+  }
+
+  clearInterval(recInterval);
+  recInterval = setInterval(() => {
+    recSeconds += 1;
+    const t = document.getElementById(`rec-timer-${id}`);
+    if (t) {
+      const mm = String(Math.floor(recSeconds / 60)).padStart(2, `0`);
+      const ss = String(recSeconds % 60).padStart(2, `0`);
+      t.textContent = `${mm}:${ss}`;
+    }
+  }, 1000);
+
+  render();
+  startWaveLoop(id);
+}
+
+function startWaveLoop(id) {
+  cancelAnimationFrame(waveAnimId);
+  const canvas = document.getElementById(`wave-${id}`);
+  if (!canvas) return;
+  const ctx = canvas.getContext(`2d`);
+  canvas.width = canvas.offsetWidth || 300;
+  canvas.height = canvas.offsetHeight || 44;
+
+  const primaryColor = getComputedStyle(document.documentElement).getPropertyValue(`--primary`).trim() || `#0f7c8a`;
+  const dataArray = analyserNode ? new Uint8Array(analyserNode.frequencyBinCount) : null;
+
+  function draw() {
+    if (activeRecordingId !== id) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const bars = 28;
+    const barW = Math.max(3, Math.floor((canvas.width - 16) / bars) - 2);
+    if (analyserNode && dataArray) {
+      analyserNode.getByteFrequencyData(dataArray);
+    }
+    ctx.fillStyle = primaryColor;
+    for (let i = 0; i < bars; i += 1) {
+      const amp = dataArray ? (dataArray[i % dataArray.length] / 255) : (0.2 + 0.5 * Math.abs(Math.sin(Date.now() / 220 + i * 0.6)));
+      const h = Math.max(4, Math.round(amp * (canvas.height - 10)));
+      const x = 8 + i * (barW + 2);
+      const y = Math.floor((canvas.height - h) / 2);
+      ctx.fillRect(x, y, barW, h);
+    }
+    waveAnimId = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopVoiceMemo(id, runDiag = true) {
+  clearInterval(recInterval);
+  cancelAnimationFrame(waveAnimId);
+  if (speechRec) {
+    try { speechRec.stop(); } catch (e) {}
+    speechRec = null;
+  }
+  if (mediaRecorder && mediaRecorder.state !== `inactive`) {
+    try { mediaRecorder.stop(); } catch (e) {}
+  }
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(t => t.stop());
+    mediaStream = null;
+  }
+  if (audioCtx) {
+    try { audioCtx.close(); } catch (e) {}
+    audioCtx = null;
+    analyserNode = null;
+  }
+  const duration = recSeconds;
+  activeRecordingId = null;
+
+  if (runDiag) {
+    const ta = document.getElementById(`transcript-${id}`);
+    const text = ta ? ta.value.trim() : (liveTranscriptDrafts[id] || ``).trim();
+    if (text.length >= 6) {
+      evaluateExplanation(id, text, duration);
+    } else {
+      setInlineMsg(`voice-${id}`, `音声録音を停止しました（${duration}秒）。自分の言葉で要約を入力または話した内容を確認し、「AIリスニング理解度診断」を押してください。`, false, false);
+      render();
+    }
+  } else {
+    render();
+  }
+}
+
+function onTranscriptInput(id, val) {
+  liveTranscriptDrafts[id] = val;
+}
+
+function evaluateExplanation(id, explicitText = null, explicitDuration = 0) {
+  const item = CURRICULUM.find(c => c.id === id);
+  if (!item) return;
+  const ta = document.getElementById(`transcript-${id}`);
+  const text = (explicitText !== null ? explicitText : (ta ? ta.value : (liveTranscriptDrafts[id] || ``))).trim();
+
+  if (text.length < 8) {
+    setInlineMsg(`voice-${id}`, `診断するには8文字以上の自分の言葉での解説（例・理由・ポイント）を入力してください。`, true);
+    render();
+    return;
+  }
+
+  const allKw = getEffectiveKeywords(item);
+  const norm = text.toLowerCase().replace(/\s+/g, ``);
+
+  const matched = [];
+  const missed = [];
+  allKw.forEach(kw => {
+    const cleanTokens = kw.toLowerCase().split(/[・（）\(\)・\s]/).filter(t => t.length >= 2);
+    const hit = norm.includes(kw.toLowerCase()) || cleanTokens.some(tok => norm.includes(tok));
+    if (hit) matched.push(kw);
+    else missed.push(kw);
+  });
+
+  const kwScore = allKw.length > 0 ? Math.round((matched.length / allKw.length) * 60) : 40;
+
+  // Pedagogy / reasoning checks (grounded in Miyazaki-juku method: 状況・理由・原則例外)
+  const hasExample = /(例えば|たとえば|ケース|場合|Aさん|Bさん|売主|買主|借主|貸主|大家|業者)/.test(text);
+  const hasReason = /(なぜなら|理由|だから|ため|ので|目的|保護)/.test(text);
+  const hasException = /(原則|例外|ただし|一方|しかし|注意|問わない|限る)/.test(text);
+  const lenScore = Math.min(15, Math.round((text.length / 100) * 15));
+
+  const logicScore = (hasExample ? 10 : 0) + (hasReason ? 8 : 0) + (hasException ? 7 : 0) + lenScore;
+  const totalScore = Math.min(100, kwScore + logicScore);
+
+  let grade = `C`;
+  if (totalScore >= 85) grade = `S`;
+  else if (totalScore >= 70) grade = `A`;
+  else if (totalScore >= 45) grade = `B`;
+
+  const tips = [];
+  if (matched.length > 0) {
+    tips.push(`重要語「${matched.slice(0, 3).join(`・`)}」を自分の説明に組み込めています。`);
+  }
+  if (missed.length > 0) {
+    tips.push(`黒太文字の「${missed.slice(0, 3).join(`・`)}」にも触れると記憶の抜け漏れが防げます。`);
+  }
+  if (!hasReason) {
+    tips.push(`「なぜそのルールがあるのか（理由）」を一言添えると応用問題に強くなります。`);
+  }
+  if (!hasExample) {
+    tips.push(`「たとえば〜の場面では」と具体的な状況を想定して話してみましょう。`);
+  }
+  if (!hasException) {
+    tips.push(`「原則は〜、ただし例外として〜」と整理すると本試験のひっかけ対策になります。`);
+  }
+
+  const memoEntry = {
+    date: getTodayStr(),
+    durationSec: explicitDuration || recSeconds || 0,
+    transcript: text,
+    score: totalScore,
+    grade,
+    matched,
+    missed,
+    hasExample,
+    hasReason,
+    hasException,
+    feedback: tips.join(` `)
+  };
+
+  const st = getLectureState(id);
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].memos = [memoEntry, ...st.memos].slice(0, 10);
+  liveTranscriptDrafts[id] = text;
+  setInlineMsg(`voice-${id}`, `AIリスニング理解度診断が完了しました（判定：${grade}ランク / ${totalScore}点）。`, false, true);
+  persistState();
+  render();
+}
+
+function applyDiagnosisToMastery(id, score) {
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].mastery = Math.min(100, Math.max(0, Math.round(score)));
+  setInlineMsg(`voice-${id}`, `診断スコア（${score}%）を黒太文字理解度に反映しました。`, false, true);
+  persistState();
+  render();
+}
+
+function deleteMemo(id, idx) {
+  const st = getLectureState(id);
+  if (!appState.lectures[id]) appState.lectures[id] = {};
+  appState.lectures[id].memos = st.memos.filter((_, i) => i !== idx);
+  persistState();
+  render();
+}
+
+// JSON Sync & Backup Functions
+function generateBackupJson() {
+  return JSON.stringify({
+    app: `takken-study-tracker`,
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    lectures: appState.lectures
+  }, null, 2);
+}
+
+async function copyBackupJson() {
+  const jsonStr = generateBackupJson();
+  const ta = document.getElementById(`export-json-box`);
+  if (ta) ta.value = jsonStr;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(jsonStr);
+      setInlineMsg(`sync-export`, `JSONバックアップコードをクリップボードにコピーしました。`, false, true);
+    } else if (ta) {
+      ta.select();
+      document.execCommand(`copy`);
+      setInlineMsg(`sync-export`, `JSONバックアップコードをコピーしました。`, false, true);
+    }
+  } catch (err) {
+    setInlineMsg(`sync-export`, `自動コピーできない場合は、下のテキストエリアを全選択してコピーしてください。`, true);
+  }
+  render();
+}
+
+function downloadBackupFile() {
+  const jsonStr = generateBackupJson();
+  const filename = `takken_progress_${getTodayStr()}.json`;
+  if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === `function`) {
+    window.notebookAppApi.triggerFileDownload({
+      content: jsonStr,
+      contentType: `text/plain`,
+      encoding: `UTF-8`,
+      filename
+    });
+    setInlineMsg(`sync-export`, `${filename} のダウンロードを開始しました。`, false, true);
+    render();
+    return;
+  }
+  const blob = new Blob([jsonStr], { type: `application/json` });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement(`a`);
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function handleJsonFileUpload(inputEl) {
+  const file = inputEl.files && inputEl.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const box = document.getElementById(`import-json-box`);
+    if (box) box.value = String(reader.result || ``);
+    setInlineMsg(`sync-import`, `ファイル「${file.name}」を読み込みました。「検証して復元」ボタンを押してください。`, false, true);
+    render();
+  };
+  reader.readAsText(file);
+}
+
+function importBackupJson(btn) {
+  const box = document.getElementById(`import-json-box`);
+  if (!box) return;
+  const raw = box.value.trim();
+  if (!raw) {
+    setInlineMsg(`sync-import`, `復元するJSONコードを入力またはファイルから選択してください。`, true);
+    render();
+    return;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    setInlineMsg(`sync-import`, `JSONの書式が正しくありません。カッコやカンマの欠損がないか確認してください。`, true);
+    render();
+    return;
+  }
+  const lecturesObj = parsed && parsed.lectures && typeof parsed.lectures === `object` ? parsed.lectures : (parsed && typeof parsed === `object` ? parsed : null);
+  if (!lecturesObj || Array.isArray(lecturesObj)) {
+    setInlineMsg(`sync-import`, `有効な学習データ構造（lecturesオブジェクト）が見つかりません。`, true);
+    render();
+    return;
+  }
+
+  const validKeys = new Set(CURRICULUM.map(c => c.id));
+  const sanitized = {};
+  let importedCount = 0;
+  Object.keys(lecturesObj).forEach(k => {
+    if (validKeys.has(k) && lecturesObj[k] && typeof lecturesObj[k] === `object`) {
+      sanitized[k] = lecturesObj[k];
+      importedCount += 1;
+    }
+  });
+
+  if (btn.dataset.armed !== `true`) {
+    btn.dataset.armed = `true`;
+    btn.textContent = `確認：${importedCount}講分のデータを上書き復元する（もう一度押す）`;
+    setInlineMsg(`sync-import`, `${importedCount}講分の有効なデータを検出しました。現在のデータを上書きして復元するにはもう一度ボタンを押してください。`, false, false);
+    return;
+  }
+
+  btn.dataset.armed = `false`;
+  appState.lectures = sanitized;
+  persistState();
+  setInlineMsg(`sync-import`, `${importedCount}講分の学習データを復元・同期しました！`, false, true);
+  render();
+}
+
+function loadSampleDemoData() {
+  const today = getTodayStr();
+  const d1 = new Date(); d1.setDate(d1.getDate() - 2);
+  const d2 = new Date(); d2.setDate(d2.getDate() - 1);
+  const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, `0`)}-${String(d.getDate()).padStart(2, `0`)}`;
+
+  appState.lectures = {
+    'kenri-1': { mastery: 85, logs: [{ date: fmt(d1), minutes: 3 }], checkedKw: [`申込み`, `承諾`, `意思表示`, `合致`, `書面不要`], memos: [] },
+    'kenri-3': { mastery: 75, logs: [{ date: fmt(d1), minutes: 4 }], checkedKw: [`虚偽表示`, `無効`, `善意`, `悪意`], memos: [] },
+    'kenri-9': {
+      mastery: 90,
+      logs: [{ date: fmt(d2), minutes: 6 }],
+      checkedKw: [`区分所有権`, `専有部分`, `共用部分`, `規約`, `4分の3以上`, `議決権`, `占有者`],
+      memos: [{
+        date: fmt(d2),
+        durationSec: 42,
+        transcript: `区分所有法はマンションの共同生活ルール。たとえば住んでいる賃借人などの占有者は、利害関係があれば集会で意見を述べられるが議決権はない。規約の設定変更廃止は原則として区分所有者および議決権の各4分の3以上の決議が必要。`,
+        score: 88,
+        grade: `S`,
+        matched: [`区分所有権`, `規約`, `4分の3以上`, `占有者`, `議決権`],
+        missed: [`専有部分`, `共用部分`],
+        hasExample: true,
+        hasReason: false,
+        hasException: true,
+        feedback: `重要語「区分所有権・規約・4分の3以上」を自分の説明に組み込めています。黒太文字の「専有部分・共用部分」にも触れると記憶の抜け漏れが防げます。`
+      }]
+    },
+    'kenri-22': { mastery: 65, logs: [{ date: today, minutes: 5 }], checkedKw: [`追完請求`, `代金減額請求`], memos: [] },
+    'kenri-26': { mastery: 80, logs: [{ date: today, minutes: 5 }], checkedKw: [`法定相続分`, `配偶者居住権`, `相続放棄`], memos: [] },
+    'hourei-3': { mastery: 70, logs: [{ date: fmt(d2), minutes: 6 }], checkedKw: [`開発行為`, `開発許可`, `1,000㎡以上`], memos: [] },
+    'gyouhou-7': { mastery: 85, logs: [{ date: today, minutes: 8 }], checkedKw: [`35条書面`, `契約成立前`, `宅建士が記名・説明`, `水害ハザードマップ`], memos: [] }
+  };
+  persistState();
+  setInlineMsg(`sync-reset`, `サンプル学習記録を読み込みました。グラフ画面や各講で動作を確認できます。`, false, true);
+  render();
+}
+
+function resetAllData(btn) {
+  if (btn.dataset.armed !== `true`) {
+    btn.dataset.armed = `true`;
+    btn.textContent = `本当に全データを初期化する（もう一度押す）`;
+    return;
+  }
+  btn.dataset.armed = `false`;
+  appState.lectures = {};
+  appState.revealedKw = {};
+  liveTranscriptDrafts = {};
+  persistState();
+  setInlineMsg(`sync-reset`, `すべての学習ログ・理解度・音声メモを初期化しました。`, false, true);
+  render();
+}
+
+// Rendering
+function updateGlobalKpisOnly() {
+  const stats = computeSummaryStats();
+
+  const pVal = document.getElementById(`kpi-progress-val`);
+  const pSub = document.getElementById(`kpi-progress-sub`);
+  const pCard = document.getElementById(`kpi-card-progress`);
+  if (pVal) pVal.textContent = `${stats.progressPct}% (${stats.studiedCount}/${stats.totalLectures}講)`;
+  if (pSub) pSub.textContent = stats.studiedCount === 0 ? `まずは第1講またはAAランクから記録` : `未学習：残り ${stats.totalLectures - stats.studiedCount}講`;
+  if (pCard) pCard.setAttribute(`data-status`, stats.progressPct >= 80 ? `ok` : (stats.studiedCount > 0 ? `` : `idle`));
+
+  const mVal = document.getElementById(`kpi-mastery-val`);
+  const mSub = document.getElementById(`kpi-mastery-sub`);
+  const mCard = document.getElementById(`kpi-card-mastery`);
+  if (mVal) mVal.textContent = `${stats.avgMastery}%`;
+  if (mSub) {
+    mSub.textContent = stats.avgMastery >= 80 ? `合格基準（80%以上）を達成中` : `合格目安ライン：80%以上（あと${Math.max(0, 80 - stats.avgMastery)}%）`;
+    mSub.setAttribute(`data-status`, stats.avgMastery >= 80 ? `ok` : ``);
+  }
+  if (mCard) mCard.setAttribute(`data-status`, stats.avgMastery >= 80 ? `ok` : (stats.avgMastery > 0 ? `warn` : `idle`));
+
+  const kVal = document.getElementById(`kpi-kenri-time-val`);
+  const kSub = document.getElementById(`kpi-kenri-time-sub`);
+  const kCard = document.getElementById(`kpi-card-kenri-time`);
+  const diff = stats.kenriTargetMin - stats.kenriActualMin;
+  if (kVal) kVal.textContent = `${stats.kenriActualMin} / ${stats.kenriTargetMin}分`;
+  if (kSub) {
+    kSub.textContent = diff > 0 ? `1時間30分目標まで残り ${diff}分` : `90分目標を達成（+${Math.abs(diff)}分）`;
+    kSub.setAttribute(`data-status`, diff <= 0 ? `ok` : ``);
+  }
+  if (kCard) kCard.setAttribute(`data-status`, diff <= 0 ? `ok` : (stats.kenriActualMin > 0 ? `` : `idle`));
+
+  const tVal = document.getElementById(`kpi-total-time-val`);
+  const tSub = document.getElementById(`kpi-streak-sub`);
+  const tCard = document.getElementById(`kpi-card-streak`);
+  if (tVal) tVal.textContent = `${stats.totalMin}分（連続${stats.streak}日）`;
+  if (tSub) tSub.textContent = `音声解説メモ：${stats.totalMemos}件 / 学習日数：${stats.studyDays}日`;
+  if (tCard) tCard.setAttribute(`data-status`, stats.streak >= 3 ? `ok` : (stats.totalMin > 0 ? `` : `idle`));
+
+  SUBJECTS.forEach(s => {
+    const badge = document.getElementById(`nav-count-${s.id}`);
+    if (badge) {
+      const sub = stats.bySubject[s.id];
+      badge.textContent = `${sub.studied}/${sub.total}`;
+    }
+  });
+}
+
+function renderNavState() {
+  const views = [`kenri`, `hourei`, `gyouhou`, `dashboard`, `sync`];
+  views.forEach(v => {
+    const tab = document.getElementById(`tab-${v}`);
+    const dock = document.getElementById(`dock-${v}`);
+    const active = appState.activeView === v;
+    if (tab) tab.classList.toggle(`is-active`, active);
+    if (dock) dock.classList.toggle(`is-active`, active);
+  });
+}
+
+function renderSubjectView(subjectId) {
+  const subj = SUBJECTS.find(s => s.id === subjectId);
+  if (!subj) return ``;
+  const allItems = CURRICULUM.filter(c => c.subject === subjectId);
+  const stats = computeSummaryStats();
+  const subStats = stats.bySubject[subjectId];
+
+  const rankCounts = { ALL: allItems.length, AA: 0, A: 0, B: 0, C: 0 };
+  allItems.forEach(c => { rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1; });
+
+  const q = appState.searchQuery.trim().toLowerCase();
+  const filtered = allItems.filter(item => {
+    if (appState.rankFilter !== `ALL` && item.rank !== appState.rankFilter) return false;
+    const st = getLectureState(item.id);
+    if (appState.statusFilter === `UNSTUDIED` && isLectureStudied(item.id)) return false;
+    if (appState.statusFilter === `REVIEW` && !(isLectureStudied(item.id) && st.mastery < 80)) return false;
+    if (appState.statusFilter === `OK` && st.mastery < 80) return false;
+    if (q) {
+      const kwJoined = getEffectiveKeywords(item).join(` `).toLowerCase();
+      const hay = `第${item.num}講 ${item.title} ${item.page} ${kwJoined}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const avgSubMastery = Math.round(subStats.masterySum / subStats.total);
+  const timePct = Math.min(100, Math.round((subStats.actualMin / subStats.targetMin) * 100));
+
+  const bannerHtml = `
+    <section class="subject-banner">
+      <div>
+        <div class="subject-title-row">
+          <h2 class="section-heading">${escapeHtml(subj.name)}（全${subStats.total}講）</h2>
+          <span class="chip chip-target">目次順固定</span>
+          <span class="chip chip-ok">完了 ${subStats.studied}/${subStats.total}講</span>
+        </div>
+        <p class="kpi-sub">${escapeHtml(subj.description)}</p>
+      </div>
+      <div class="time-alloc-box">
+        <div class="time-alloc-row">
+          <span>目標時間配分との比較</span>
+          <span class="time-alloc-nums">${subStats.actualMin} / ${subStats.targetMin}分${subjectId === `kenri` ? `（1時間30分）` : ``}</span>
+        </div>
+        <div class="meter-track" aria-label="目標時間進捗">
+          <div class="meter-fill" style="width: ${timePct}%" data-status="${subStats.actualMin >= subStats.targetMin ? `ok` : ``}"></div>
+        </div>
+        <div class="time-alloc-row" style="margin-top: 0.35rem;">
+          <span>科目平均 理解度</span>
+          <span class="time-alloc-nums">${avgSubMastery}%</span>
+        </div>
+      </div>
+    </section>
+  `;
+
+  const filterHtml = `
+    <section class="filter-bar" aria-label="絞り込み">
+      <div class="filter-row">
+        <span class="filter-label">重要度RANK:</span>
+        ${[`ALL`, `AA`, `A`, `B`, `C`].map(r => `
+          <button type="button" class="chip-btn ${appState.rankFilter === r ? `is-active` : ``}" onclick="setRankFilter('${r}')">
+            ${r === `ALL` ? `すべて` : `RANK ${r}`} (${rankCounts[r] || 0})
+          </button>
+        `).join(``)}
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">習得状況:</span>
+        ${[
+          { key: `ALL`, label: `すべて` },
+          { key: `UNSTUDIED`, label: `未学習` },
+          { key: `REVIEW`, label: `要復習 (<80%)` },
+          { key: `OK`, label: `合格圏 (80%+)` }
+        ].map(s => `
+          <button type="button" class="chip-btn ${appState.statusFilter === s.key ? `is-active` : ``}" onclick="setStatusFilter('${s.key}')">
+            ${s.label}
+          </button>
+        `).join(``)}
+      </div>
+      <div class="search-input-wrap">
+        <div class="field-group">
+          <label class="field-label" for="lecture-search">テーマ名・重要キーワードで検索</label>
+          <input id="lecture-search" type="search" class="text-input" placeholder="例：区分所有法、抵当権、35条…" value="${escapeHtml(appState.searchQuery)}" oninput="onSearchInput(this.value)">
+        </div>
+        ${(appState.rankFilter !== `ALL` || appState.statusFilter !== `ALL` || q !== ``) ? `
+          <button type="button" class="btn btn-ghost" onclick="clearFilters()">条件を解除</button>
+        ` : ``}
+      </div>
+    </section>
+  `;
+
+  const cardsHtml = filtered.length === 0
+    ? `<div class="empty-box">
+         <p class="kpi-value">該当する講がありません</p>
+         <p class="kpi-sub">選択したRANKまたは検索条件に一致するテーマが見つかりませんでした。</p>
+         <button type="button" class="btn btn-secondary" onclick="clearFilters()">すべての講を表示する</button>
+       </div>`
+    : `<div class="lecture-list" id="lecture-list-container">
+         ${filtered.map(item => renderLectureCard(item)).join(``)}
+       </div>`;
+
+  return `${bannerHtml}${filterHtml}${cardsHtml}`;
+}
+
+function renderLectureCard(item) {
+  const st = getLectureState(item.id);
+  const mins = getLectureMinutes(item.id);
+  const latestDate = getLectureLatestDate(item.id);
+  const status = getLectureStatus(item.id);
+  const kwList = getEffectiveKeywords(item);
+  const kwCount = getEffectiveKwCount(item);
+  const pageLabel = getEffectivePage(item);
+  const targetMin = getEffectiveTargetMin(item);
+  const isExpanded = appState.expandedId === item.id;
+  const isRevealed = Boolean(appState.revealedKw[item.id]);
+  const isRec = activeRecordingId === item.id;
+  const latestMemo = st.memos[0] || null;
+  const transcriptVal = liveTranscriptDrafts[item.id] !== undefined ? liveTranscriptDrafts[item.id] : (latestMemo ? latestMemo.transcript : ``);
+
+  const masteryStatus = st.mastery >= 80 ? `ok` : (st.mastery >= 50 ? `warn` : `alert`);
+  const logMsg = uiMessages[`log-${item.id}`];
+  const voiceMsg = uiMessages[`voice-${item.id}`];
+
+  return `
+    <article class="lecture-card" id="card-${item.id}" data-status="${status}">
+      <div class="lecture-top">
+        <div>
+          <div class="lecture-badges">
+            <span class="lecture-num">第${item.num}講</span>
+            <span class="chip chip-rank-${item.rank}">RANK ${item.rank}</span>
+            <span class="chip chip-page" id="page-badge-${item.id}">${escapeHtml(pageLabel)}</span>
+            <span class="chip chip-kw">黒太文字 ${kwCount}個</span>
+            <span class="chip chip-target">目標 ${targetMin}分</span>
+          </div>
+          <h3 class="lecture-title">${escapeHtml(item.title)}</h3>
+        </div>
+        <button type="button" class="btn ${isExpanded ? `btn-primary` : `btn-secondary`} btn-sm" onclick="toggleExpand('${item.id}')" aria-expanded="${isExpanded}">
+          ${isExpanded ? `閉じる` : `記録・音声診断`}
+        </button>
+      </div>
+
+      <div class="lecture-summary-row">
+        <div class="mastery-summary">
+          <div class="mastery-header">
+            <span>黒太文字 理解度</span>
+            <span class="mastery-pct" id="mastery-pct-${item.id}">${st.mastery}%</span>
+          </div>
+          <div class="meter-track" title="緑の帯は合格目標（80〜100%）">
+            <div class="meter-target-band"></div>
+            <div class="meter-fill" id="mastery-fill-${item.id}" style="width: ${st.mastery}%" data-status="${masteryStatus}"></div>
+          </div>
+        </div>
+        <div class="log-summary">
+          <span>直近学習：<strong>${latestDate ? formatDateJP(latestDate) : `未記録`}</strong>（累計 ${mins}分 / 目標 ${targetMin}分）</span>
+          <span>音声解説：${latestMemo ? `<strong class="chip chip-ok">AI診断 ${latestMemo.grade} (${latestMemo.score}点)</strong>` : `未録音`}</span>
+        </div>
+      </div>
+
+      ${isExpanded ? `
+        <div class="lecture-detail">
+          <!-- 1. 黒太文字・記憶想起 & テキスト対応ページ -->
+          <section class="detail-section">
+            <div class="detail-heading">
+              <span>記憶想起：黒太文字（重要キーワード）チェック</span>
+              <div class="quick-min-row">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="adjustKwCount('${item.id}', -1)" aria-label="黒太文字個数を1減らす">−1</button>
+                <span class="chip chip-kw">${kwCount}個</span>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="adjustKwCount('${item.id}', 1)" aria-label="黒太文字個数を1増やす">＋1</button>
+              </div>
+            </div>
+            <p class="kpi-sub">テキストを閉じる前に「${kwCount}個の黒太文字」を頭の中で思い出し、確認ボタンで答え合わせしましょう。</p>
+            <div class="voice-controls">
+              <button type="button" class="btn ${isRevealed ? `btn-ghost` : `btn-secondary`} btn-sm" onclick="toggleRevealKw('${item.id}')">
+                ${isRevealed ? `キーワードを隠す（記憶テスト）` : `黒太文字リストを表示する（${kwList.length}語）`}
+              </button>
+            </div>
+            ${isRevealed ? `
+              <div class="kw-chips-wrap">
+                ${kwList.map(kw => {
+                  const checked = st.checkedKw.includes(kw);
+                  return `<button type="button" class="kw-toggle-chip ${checked ? `is-checked` : ``}" onclick="toggleKeywordCheck('${item.id}', '${escapeHtml(kw)}')">
+                    <span>${checked ? `✓` : `○`}</span>
+                    <span>${escapeHtml(kw)}</span>
+                  </button>`;
+                }).join(``)}
+              </div>
+              <div class="search-input-wrap" style="margin-top: 0.35rem;">
+                <div class="field-group">
+                  <label class="field-label" for="custom-kw-input-${item.id}">テキストの黒太文字・付箋メモを追加</label>
+                  <input id="custom-kw-input-${item.id}" type="text" class="text-input" placeholder="追加したい重要用語を入力">
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addCustomKeyword('${item.id}')">用語追加</button>
+              </div>
+            ` : ``}
+            <div class="field-group" style="margin-top: 0.25rem;">
+              <label class="field-label" for="page-edit-${item.id}">テキスト対応ページ表記（編集可）</label>
+              <input id="page-edit-${item.id}" type="text" class="text-input" value="${escapeHtml(pageLabel)}" onchange="updatePageOverride('${item.id}', this.value)">
+            </div>
+          </section>
+
+          <!-- 2. 学習ログ（月日・読書時間）＆ 黒太文字理解度％ -->
+          <section class="detail-section">
+            <h4 class="detail-heading">学習ログ（月日・読書時間）＆ 黒太文字理解度％</h4>
+            <div class="field-group">
+              <label class="field-label" for="mastery-slider-${item.id}">黒太文字理解度（%）（緑の帯：80%〜100% 合格圏）</label>
+              <div class="mastery-control-row">
+                <input id="mastery-slider-${item.id}" type="range" min="0" max="100" step="5" value="${st.mastery}" class="range-slider" oninput="onMasterySliderInput('${item.id}', this.value)">
+                <input id="mastery-num-${item.id}" type="number" min="0" max="100" value="${st.mastery}" class="num-input" aria-label="理解度パーセント数値入力" oninput="onMasteryNumberInput('${item.id}', this.value)">
+              </div>
+              <div class="quick-min-row">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="setMasteryQuick('${item.id}', 50)">50%</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="setMasteryQuick('${item.id}', 70)">70%</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="setMasteryQuick('${item.id}', 80)">80% (合格圏)</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="setMasteryQuick('${item.id}', 100)">100%</button>
+              </div>
+            </div>
+
+            <div class="log-form-grid" style="margin-top: 0.5rem;">
+              <div class="field-group">
+                <label class="field-label" for="log-date-${item.id}">学習した月日</label>
+                <input id="log-date-${item.id}" type="date" class="date-input" value="${getTodayStr()}">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="log-min-${item.id}">読書時間（分）</label>
+                <input id="log-min-${item.id}" type="number" min="1" max="180" value="${targetMin}" class="num-input">
+              </div>
+              <button type="button" class="btn btn-primary" onclick="addStudyLog('${item.id}')">ログ記録</button>
+            </div>
+            <div class="quick-min-row">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="setLogDateQuick('${item.id}', 0)">今日</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="setLogDateQuick('${item.id}', -1)">昨日</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="bumpLogMinutes('${item.id}', 1)">+1分</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="bumpLogMinutes('${item.id}', 3)">+3分</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="bumpLogMinutes('${item.id}', 5)">+5分</button>
+            </div>
+
+            ${logMsg ? `<div class="inline-msg ${logMsg.isError ? `is-error` : (logMsg.isOk ? `is-ok` : ``)}">${escapeHtml(logMsg.text)}</div>` : ``}
+
+            ${st.logs.length > 0 ? `
+              <div class="history-list">
+                ${st.logs.map((l, idx) => `
+                  <div class="history-item">
+                    <span><strong>${formatDateJP(l.date)}</strong> ・ 読書時間 <strong>${l.minutes}分</strong></span>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="deleteStudyLog('${item.id}', ${idx})">削除</button>
+                  </div>
+                `).join(``)}
+              </div>
+            ` : `<p class="kpi-sub">まだ読書ログがありません。「ログ記録」から月日と読書時間（分）を保存できます。</p>`}
+          </section>
+
+          <!-- 3. 自分の言葉ボイスメモ＆AIリスニング理解度診断 -->
+          <section class="detail-section">
+            <h4 class="detail-heading">自分の言葉で解説ボイスメモ ＆ AIリスニング理解度診断</h4>
+            <p class="kpi-sub">テキストを見ずに「どんな状況か・なぜその結論になるか・原則と例外」を自分の言葉で話して録音しましょう。</p>
+
+            <div class="voice-controls">
+              ${isRec ? `
+                <button type="button" class="btn btn-danger" onclick="stopVoiceMemo('${item.id}', true)">録音停止 ＆ AI診断</button>
+                <span class="rec-indicator"><span class="rec-dot"></span>録音中 <span id="rec-timer-${item.id}">00:00</span></span>
+              ` : `
+                <button type="button" class="btn btn-primary" onclick="startVoiceMemo('${item.id}')">録音して自分の言葉で解説</button>
+                <button type="button" class="btn btn-secondary" onclick="evaluateExplanation('${item.id}')">テキスト内容でAI診断</button>
+              `}
+            </div>
+
+            ${isRec ? `<canvas class="wave-canvas" id="wave-${item.id}"></canvas>` : ``}
+
+            ${sessionAudioUrls[item.id] ? `
+              <div class="field-group">
+                <span class="field-label">今回の録音音声を再生して確認</span>
+                <audio controls src="${sessionAudioUrls[item.id]}" style="width: 100%;"></audio>
+              </div>
+            ` : ``}
+
+            <div class="field-group">
+              <label class="field-label" for="transcript-${item.id}">自分の言葉での解説テキスト（音声自動文字起こし・手動編集可）</label>
+              <textarea id="transcript-${item.id}" class="memo-textarea" placeholder="例：虚偽表示とは、AさんとBさんがウソの売買契約をすること。当事者間では原則無効だけど、事情を知らない善意の第三者Cさんは保護される…" oninput="onTranscriptInput('${item.id}', this.value)">${escapeHtml(transcriptVal)}</textarea>
+            </div>
+
+            ${voiceMsg ? `<div class="inline-msg ${voiceMsg.isError ? `is-error` : (voiceMsg.isOk ? `is-ok` : ``)}">${escapeHtml(voiceMsg.text)}</div>` : ``}
+
+            ${st.memos.length > 0 ? `
+              <div class="history-list">
+                ${st.memos.map((m, idx) => `
+                  <div class="diagnosis-card">
+                    <div class="diagnosis-header">
+                      <span class="diag-grade">AI理解度判定：${escapeHtml(m.grade)}ランク（${m.score}点）</span>
+                      <div class="quick-min-row">
+                        <span class="chip chip-page">${formatDateJP(m.date)}${m.durationSec ? `・${m.durationSec}秒` : ``}</span>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="applyDiagnosisToMastery('${item.id}', ${m.score})">理解度%に反映</button>
+                        <button type="button" class="btn btn-ghost btn-sm" onclick="deleteMemo('${item.id}', ${idx})">削除</button>
+                      </div>
+                    </div>
+                    <p class="diag-feedback">${escapeHtml(m.feedback)}</p>
+                    <div class="kw-chips-wrap">
+                      ${m.matched.map(k => `<span class="chip chip-ok">✓ ${escapeHtml(k)}</span>`).join(``)}
+                      ${m.missed.map(k => `<span class="chip chip-warn">未言及: ${escapeHtml(k)}</span>`).join(``)}
+                    </div>
+                  </div>
+                `).join(``)}
+              </div>
+            ` : ``}
+          </section>
+        </div>
+      ` : ``}
+    </article>
+  `;
+}
+
+function renderDashboardView() {
+  const stats = computeSummaryStats();
+
+  // Review Priority List (AA and A lectures with mastery < 80)
+  const priorityList = CURRICULUM.filter(item => (item.rank === `AA` || item.rank === `A`) && getLectureState(item.id).mastery < 80).slice(0, 8);
+
+  return `
+    <section class="chart-grid">
+      <div class="chart-panel">
+        <h2 class="chart-title">権利関係 90分目標 vs 実績時間（RANK別）</h2>
+        <p class="chart-sub">重要度AA（36分）・A（30分）・B（19分）・C（5分）＝ 合計90分（1時間30分）配分に対する実績比較</p>
+        <div class="chart-box">
+          <canvas id="chart-kenri-rank"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <h2 class="chart-title">科目別の進捗率・平均理解度（目標80%）</h2>
+        <p class="chart-sub">①権利関係・②法令上の制限・③宅建業法の完了率と黒太文字理解度のバランス</p>
+        <div class="chart-box">
+          <canvas id="chart-subject-mastery"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-panel chart-panel-wide">
+        <h2 class="chart-title">日別 学習時間（分）と累計読書時間の推移</h2>
+        <p class="chart-sub">${stats.studyDays > 0 ? `記録された全${stats.studyDays}日間の日別学習ペース（合計 ${stats.totalMin}分）` : `各講で「月日・読書時間」を記録すると、日別推移グラフがここに自動生成されます。`}</p>
+        <div class="chart-box">
+          <canvas id="chart-daily-trend"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="status-card" data-status="${priorityList.length === 0 ? `ok` : `warn`}">
+      <h2 class="section-heading" style="margin-bottom: 0.5rem;">優先攻略ピックアップ（AA・Aランクで理解度80%未満）</h2>
+      ${priorityList.length === 0 ? `
+        <p class="kpi-sub" data-status="ok">すべてのAA・Aランク講義が理解度80%以上の合格圏に到達しています！</p>
+      ` : `
+        <div class="history-list" style="margin-top: 0.75rem;">
+          ${priorityList.map(item => {
+            const st = getLectureState(item.id);
+            const subj = SUBJECTS.find(s => s.id === item.subject);
+            return `
+              <div class="history-item">
+                <div>
+                  <span class="chip chip-rank-${item.rank}">RANK ${item.rank}</span>
+                  <strong>${escapeHtml(subj ? subj.shortName : ``)} 第${item.num}講 ${escapeHtml(item.title)}</strong>
+                  <span class="kpi-sub" style="display:inline; margin-left: 0.5rem;">現在 ${st.mastery}% / 目標 ${getEffectiveTargetMin(item)}分</span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="jumpToLecture('${item.id}')">この講を開く</button>
+              </div>
+            `;
+          }).join(``)}
+        </div>
+      `}
+    </section>
+  `;
+}
+
+function renderSyncView() {
+  const exportMsg = uiMessages[`sync-export`];
+  const importMsg = uiMessages[`sync-import`];
+  const resetMsg = uiMessages[`sync-reset`];
+  const jsonStr = generateBackupJson();
+
+  return `
+    <section class="sync-grid">
+      <div class="sync-card">
+        <h2 class="section-heading">JSONバックアップコードの保存（書き出し）</h2>
+        <p class="kpi-sub">スマホ（iPhone）とPC間でのデータ引き継ぎや、万が一に備えたバックアップ用のJSONコードを出力します。</p>
+        <div class="voice-controls">
+          <button type="button" class="btn btn-primary" onclick="copyBackupJson()">JSONコードをコピー</button>
+          <button type="button" class="btn btn-secondary" onclick="downloadBackupFile()">.jsonファイルで保存</button>
+        </div>
+        ${exportMsg ? `<div class="inline-msg ${exportMsg.isError ? `is-error` : (exportMsg.isOk ? `is-ok` : ``)}">${escapeHtml(exportMsg.text)}</div>` : ``}
+        <div class="field-group">
+          <label class="field-label" for="export-json-box">現在の学習データ（JSONコード）</label>
+          <textarea id="export-json-box" class="code-box" readonly>${escapeHtml(jsonStr)}</textarea>
+        </div>
+      </div>
+
+      <div class="sync-card">
+        <h2 class="section-heading">JSONコードからの読み込み（同期・復元）</h2>
+        <p class="kpi-sub">別端末でコピーしたJSONコードを貼り付けるか、保存済みの.jsonファイルを選択して学習データを復元します。</p>
+        <div class="field-group">
+          <label class="field-label" for="import-file-input">.jsonファイルから読み込む</label>
+          <input id="import-file-input" type="file" accept=".json,application/json,text/plain" class="text-input" onchange="handleJsonFileUpload(this)">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="import-json-box">またはJSONコードを直接貼り付け</label>
+          <textarea id="import-json-box" class="code-box" placeholder='{"app": "takken-study-tracker", "lectures": { ... }}'></textarea>
+        </div>
+        ${importMsg ? `<div class="inline-msg ${importMsg.isError ? `is-error` : (importMsg.isOk ? `is-ok` : ``)}">${escapeHtml(importMsg.text)}</div>` : ``}
+        <button type="button" class="btn btn-primary" onclick="importBackupJson(this)">検証してデータを復元</button>
+      </div>
+    </section>
+
+    <section class="sync-grid">
+      <div class="sync-card">
+        <h2 class="section-heading">iPhoneホーム画面への追加（PWA風フルスクリーン表示）</h2>
+        <p class="kpi-sub">Safari下部の「共有（四角に上矢印）」アイコンから<strong>「ホーム画面に追加」</strong>を選ぶと、iPhone画面いっぱいにアプリとして起動できます。</p>
+      </div>
+
+      <div class="sync-card" data-status="warn">
+        <h2 class="section-heading">サンプル体験 ＆ データ初期化</h2>
+        <p class="kpi-sub">進捗グラフやAI音声診断の動作をすぐ試したい場合はサンプルデータを読み込めます。</p>
+        <div class="voice-controls">
+          <button type="button" class="btn btn-secondary" onclick="loadSampleDemoData()">サンプル記録を入れて試す</button>
+          <button type="button" class="btn btn-danger-outline" onclick="resetAllData(this)">全データを初期化</button>
+        </div>
+        ${resetMsg ? `<div class="inline-msg ${resetMsg.isError ? `is-error` : (resetMsg.isOk ? `is-ok` : ``)}">${escapeHtml(resetMsg.text)}</div>` : ``}
+      </div>
+    </section>
+  `;
+}
+
+function renderCharts() {
+  if (typeof Chart === `undefined`) return;
+  Object.values(chartInstances).forEach(ch => {
+    try { ch.destroy(); } catch (e) {}
+  });
+  chartInstances = {};
+
+  const styles = getComputedStyle(document.documentElement);
+  const cPrimary = styles.getPropertyValue(`--data-1`).trim() || `#0f7c8a`;
+  const cGreen = styles.getPropertyValue(`--data-2`).trim() || `#2e7d4f`;
+  const cAmber = styles.getPropertyValue(`--data-3`).trim() || `#b86e00`;
+  const cContext = styles.getPropertyValue(`--data-context`).trim() || `#b8c7ca`;
+  const cGrid = styles.getPropertyValue(`--outline-variant`).trim() || `#d5e3e5`;
+  const cText = styles.getPropertyValue(`--on-surface-variant`).trim() || `#46585f`;
+
+  const stats = computeSummaryStats();
+
+  // 1. Kenri 90-min breakdown by Rank
+  const ctxRank = document.getElementById(`chart-kenri-rank`);
+  if (ctxRank) {
+    const ranks = [`AA`, `A`, `B`, `C`];
+    const targetData = [0, 0, 0, 0];
+    const actualData = [0, 0, 0, 0];
+    CURRICULUM.filter(c => c.subject === `kenri`).forEach(item => {
+      const idx = ranks.indexOf(item.rank);
+      if (idx !== -1) {
+        targetData[idx] += getEffectiveTargetMin(item);
+        actualData[idx] += getLectureMinutes(item.id);
+      }
+    });
+    chartInstances.rank = new Chart(ctxRank, {
+      type: `bar`,
+      data: {
+        labels: [`RANK AA`, `RANK A`, `RANK B`, `RANK C`],
+        datasets: [
+          { label: `目標時間（計90分）`, data: targetData, backgroundColor: cContext, borderRadius: 4 },
+          { label: `実読書時間（分）`, data: actualData, backgroundColor: cPrimary, borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: `top`, labels: { color: cText } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: cText } },
+          y: { beginAtZero: true, grid: { color: cGrid }, ticks: { color: cText, callback: v => `${v}分` } }
+        }
+      }
+    });
+  }
+
+  // 2. Subject progress & avg mastery
+  const ctxSubj = document.getElementById(`chart-subject-mastery`);
+  if (ctxSubj) {
+    const labels = SUBJECTS.map(s => s.shortName);
+    const progData = SUBJECTS.map(s => {
+      const sub = stats.bySubject[s.id];
+      return Math.round((sub.studied / sub.total) * 100);
+    });
+    const mastData = SUBJECTS.map(s => {
+      const sub = stats.bySubject[s.id];
+      return Math.round(sub.masterySum / sub.total);
+    });
+    chartInstances.subj = new Chart(ctxSubj, {
+      type: `bar`,
+      data: {
+        labels,
+        datasets: [
+          { label: `学習着手率 (%)`, data: progData, backgroundColor: cPrimary, borderRadius: 4 },
+          { label: `平均 黒太文字理解度 (%)`, data: mastData, backgroundColor: cGreen, borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: `top`, labels: { color: cText } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: cText } },
+          y: { min: 0, max: 100, grid: { color: cGrid }, ticks: { color: cText, callback: v => `${v}%` } }
+        }
+      }
+    });
+  }
+
+  // 3. Daily study trend
+  const ctxDaily = document.getElementById(`chart-daily-trend`);
+  if (ctxDaily) {
+    const dates = Object.keys(stats.dateMap).sort();
+    const labels = dates.length > 0 ? dates.map(formatDateJP) : [`記録待ち`];
+    const dailyMin = dates.length > 0 ? dates.map(d => stats.dateMap[d]) : [0];
+    let cum = 0;
+    const cumMin = dailyMin.map(v => { cum += v; return cum; });
+
+    chartInstances.daily = new Chart(ctxDaily, {
+      type: `bar`,
+      data: {
+        labels,
+        datasets: [
+          { label: `日別読書時間（分）`, data: dailyMin, backgroundColor: cPrimary, borderRadius: 4, yAxisID: `y` },
+          { label: `累計学習時間（分）`, data: cumMin, type: `line`, borderColor: cAmber, backgroundColor: cAmber, tension: 0.25, pointRadius: 4, yAxisID: `y` }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: `top`, labels: { color: cText } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: cText } },
+          y: { beginAtZero: true, grid: { color: cGrid }, ticks: { color: cText, callback: v => `${v}分` } }
+        }
+      }
+    });
+  }
+}
+
+function renderMainOnly() {
+  const main = document.getElementById(`main-content`);
+  if (!main) return;
+  if (appState.activeView === `dashboard`) {
+    main.innerHTML = renderDashboardView();
+    renderCharts();
+  } else if (appState.activeView === `sync`) {
+    main.innerHTML = renderSyncView();
+  } else {
+    main.innerHTML = renderSubjectView(appState.activeView);
+  }
+}
+
+function render() {
+  renderNavState();
+  updateGlobalKpisOnly();
+  renderMainOnly();
+}
+
+// Initialization & State Restoration
+async function initApp() {
+  try {
+    if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+      const saved = await window.notebookAppApi.getAppState();
+      if (saved && typeof saved === `object`) {
+        if (saved.activeView && [`kenri`, `hourei`, `gyouhou`, `dashboard`, `sync`].includes(saved.activeView)) {
+          appState.activeView = saved.activeView;
+        }
+        if (saved.lectures && typeof saved.lectures === `object`) {
+          appState.lectures = saved.lectures;
+        }
+      }
+    }
+  } catch (e) {}
+
+  render();
+
+  if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+    window.notebookAppApi.notifyAppReady();
+  }
+}
+
+document.addEventListener(`DOMContentLoaded`, initApp);
+</script>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js';
+const config={
+ apiKey:'AIzaSyDL39hOq9BQVCnUyMhVZSy59jgrw042kUw',
+ authDomain:'study-progress-app-9d1cd.firebaseapp.com',
+ projectId:'study-progress-app-9d1cd',
+ storageBucket:'study-progress-app-9d1cd.firebasestorage.app',
+ messagingSenderId:'475861996943',
+ appId:'1:475861996943:web:16ecf5904d1c1177a527fa'
+};
+try{
+ const app=initializeApp(config);
+ const auth=getAuth(app),db=getFirestore(app),provider=new GoogleAuthProvider();
+ let timer=null,pending=null,loading=true;
+ const btn=document.getElementById('cloud-login-button');
+ const status=window.studyCloudStatus;
+ const save=state=>{
+   pending=JSON.parse(JSON.stringify(state));
+   clearTimeout(timer);
+   timer=setTimeout(async()=>{
+     if(!auth.currentUser || !pending)return;
+     const data=pending;pending=null;
+     try{
+       await setDoc(doc(db,'users',auth.currentUser.uid,'study','main'),{state:data,updatedAt:serverTimestamp()});
+       status('クラウドに保存しました ✓');
+     }catch(e){status('クラウド保存エラー: '+e.message)}
+   },900);
+ };
+ window.studyCloud.save=save;
+ btn.addEventListener('click',async()=>{
+   if(auth.currentUser){if(confirm('Googleログインを解除しますか？'))await signOut(auth);return}
+   try{await signInWithPopup(auth,provider)}
+   catch(e){status('ログインできません: '+(e.code||e.message)+'（Firebaseの承認済みドメインに tanak21020405-png.github.io を追加してください）')}
+ });
+ onAuthStateChanged(auth,async user=>{
+   window.studyCloud.user=user;
+   if(!user){btn.textContent='Googleでログイン・同期';status('この端末には自動保存されます。Googleログインで端末間同期できます。');loading=false;return}
+   btn.textContent='ログアウト';
+   status('クラウドの記録を確認中…');
+   try{
+     const snap=await getDoc(doc(db,'users',user.uid,'study','main'));
+     const cloud=snap.exists()?snap.data().state:null;
+     const local=await window.notebookAppApi.getAppState();
+     const hasLocal=local&&local.lectures&&Object.keys(local.lectures).length>0;
+     const hasCloud=cloud&&cloud.lectures&&Object.keys(cloud.lectures).length>0;
+     if(hasCloud){
+       if(!hasLocal || confirm('クラウドに保存済みの学習記録があります。\nこの端末に読み込みますか？\n「キャンセル」を選ぶと、この端末の記録をクラウドへ保存します。')){
+         window.studyCloudApply(cloud);status('クラウドの記録を読み込みました ✓');
+       }else{save(local);status('この端末の記録をクラウドへ保存中…')}
+     }else if(hasLocal){save(local);status('この端末の記録をクラウドへ保存中…')}
+     else status('Googleログイン完了。新しい記録から同期します。');
+   }catch(e){status('クラウド読込エラー: '+e.message)}
+   loading=false;
+ });
+}catch(e){window.studyCloudStatus('Firebase接続エラー: '+e.message)}
+</script>
+</body>
+</html>
