@@ -2783,7 +2783,18 @@ try{
  btn.addEventListener('click',async()=>{
    if(auth.currentUser){if(confirm('Googleログインを解除しますか？'))await signOut(auth);return}
    try{await signInWithPopup(auth,provider)}
-   catch(e){status('ログインできません: '+(e.code||e.message)+'（Firebaseの承認済みドメインに tanak21020405-png.github.io を追加してください）')}
+   catch(e){
+     const code=e.code||'';
+     if(code==='auth/api-key-not-valid.-please-pass-a-valid-api-key.' || code==='auth/invalid-api-key'){
+       status('FirebaseのAPIキーがGoogle側で拒否されています。アプリの入力ミスではありません。Google Cloudの「APIとサービス → 認証情報」でこのキーの有効状態と制限を確認してください。学習記録はこの端末に保存されています。');
+     }else if(code==='auth/unauthorized-domain'){
+       status('Firebase Authentication → 設定 → 承認済みドメインに tanak21020405-png.github.io を追加してください。');
+     }else if(code==='auth/popup-closed-by-user'){
+       status('ログインを中断しました。学習記録はこの端末に保存されています。');
+     }else{
+       status('Googleログインエラー: '+(code||e.message)+'。学習記録はこの端末に保存されています。');
+     }
+   }
  });
  onAuthStateChanged(auth,async user=>{
    window.studyCloud.user=user;
